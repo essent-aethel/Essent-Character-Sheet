@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Essent — Agent Dossier</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nav:#1B2A4A;--blu:#2E6DA4;--lbl:#D6E8F5;--sbx:#0f1e35;
+  --wht:#FFFFFF;--lgr:#0d1829;--mgr:#4A6080;--dgr:#8BA4C4;
+  --grn:#1A6B3C;--red:#7A1A1A;
+  --bg:#07101c;--accent:#2E6DA4;--accent-l:#4A8AC4;
+  --text:#D6E8F5;--text-s:rgba(214,232,245,.78);--text-l:rgba(214,232,245,.48);
+  --field-bg:rgba(7,16,28,.9);--field-bdr:rgba(46,109,164,.4);
+  --panel-bdr:rgba(46,109,164,.22);--shadow:rgba(0,0,0,.55);
+  --void-c:#6B3FAA;--ion-c:#1A7A5A;--kin-c:#4A5A6A;--eng-c:#8B6A10;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:'Barlow',sans-serif;color:var(--text);min-height:100vh;
+  background-image:linear-gradient(rgba(46,109,164,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(46,109,164,.02) 1px,transparent 1px),radial-gradient(ellipse at 10% 0%,rgba(27,42,74,.5) 0%,transparent 50%);
+  background-size:40px 40px,40px 40px,100% 100%;}
+.tab-nav{position:sticky;top:0;z-index:100;background:rgba(7,16,28,.97);border-bottom:1px solid var(--panel-bdr);
+  display:flex;align-items:center;padding:0 1.5rem;gap:0;backdrop-filter:blur(8px);}
+.tab-nav::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blu),var(--accent-l),var(--blu));}
+.nav-brand{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:.25em;color:var(--accent-l);text-transform:uppercase;margin-right:auto;padding:.85rem 0;}
+.nav-brand span{font-size:.58rem;font-weight:400;letter-spacing:.28em;color:var(--text-l);display:block;margin-top:-.12rem;}
+.tab-btn{font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-l);background:none;border:none;border-bottom:2px solid transparent;padding:.88rem 1rem;cursor:pointer;transition:all .2s;margin-bottom:-1px;}
+.tab-btn:hover{color:var(--accent-l);}
+.tab-btn.active{color:var(--lbl);border-bottom-color:var(--accent);}
+.nav-btn{font-family:'Rajdhani',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--panel-bdr);color:var(--accent-l);padding:.3rem .78rem;border-radius:2px;cursor:pointer;margin-left:.32rem;transition:all .2s;}
+.nav-btn:hover{background:rgba(46,109,164,.12);border-color:var(--accent);}
+.save-msg{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--grn);opacity:0;transition:opacity .3s;margin-left:.38rem;}
+.save-msg.show{opacity:1;}
+.page{display:none;padding:1.2rem 1.7rem 3rem;max-width:1240px;margin:0 auto;}
+.page.active{display:block;}
+.s{background:rgba(13,24,41,.85);border-radius:3px;margin-bottom:.78rem;box-shadow:0 2px 14px var(--shadow);overflow:hidden;border:1px solid var(--panel-bdr);}
+.s-hd{background:var(--nav);padding:.4rem .95rem;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--accent);}
+.s-title{font-family:'Rajdhani',sans-serif;font-size:.77rem;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:var(--lbl);}
+.s-note{font-size:.7rem;color:var(--text-l);font-style:italic;}
+.s-body{padding:.82rem .95rem;}
+.fg{display:flex;flex-direction:column;gap:.17rem;}
+.fl{font-family:'Rajdhani',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-l);}
+.fi{background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;padding:.27rem .46rem;font-family:'Barlow',sans-serif;font-size:.87rem;color:var(--text);width:100%;transition:border-color .2s;}
+.fi:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(46,109,164,.14);}
+select.fi{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%234A6080'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .48rem center;padding-right:1.35rem;}
+textarea.fi{resize:vertical;min-height:62px;line-height:1.44;}
+.fi-b{background:transparent;border:none;border-bottom:1px solid var(--field-bdr);border-radius:0;padding:.17rem 0;font-family:'Barlow',sans-serif;font-size:.87rem;color:var(--text);}
+.fi-b:focus{outline:none;border-bottom-color:var(--accent);}
+.gr{display:grid;gap:.68rem;}
+.g3{grid-template-columns:2.5fr 1fr 1.5fr;}
+.g4{grid-template-columns:1.5fr 1.5fr 1fr 1fr;}
+.g2{grid-template-columns:1fr 1fr;}
+/* ability cards */
+.ab-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.68rem;}
+.ab-card{background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:3px;padding:.58rem;text-align:center;position:relative;}
+.ab-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.ab-card.fc::before{background:var(--red);}
+.ab-card.rc::before{background:var(--grn);}
+.ab-card.ic::before{background:var(--accent);}
+.ab-card.pc::before{background:var(--void-c);}
+.ab-n{font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:700;letter-spacing:.12em;color:var(--text-l);text-transform:uppercase;margin-bottom:.18rem;}
+.ab-sc{width:100%;text-align:center;background:transparent;border:none;border-bottom:1px solid var(--field-bdr);font-family:'Rajdhani',sans-serif;font-size:1.85rem;font-weight:700;color:var(--text);padding:.07rem 0;}
+.ab-sc:focus{outline:none;border-bottom-color:var(--accent);}
+.ab-md{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:700;color:var(--accent-l);margin-top:.2rem;}
+.ab-sv{font-size:.59rem;color:var(--text-l);margin-top:.07rem;}
+.ab-gv{font-family:'Rajdhani',sans-serif;font-size:.49rem;color:var(--mgr);letter-spacing:.05em;margin-top:.12rem;text-transform:uppercase;}
+/* combat band */
+.cb-wrap{background:rgba(13,24,41,.92);border-radius:3px;margin-bottom:.78rem;box-shadow:0 2px 14px var(--shadow);border:1px solid var(--panel-bdr);border-top:3px solid var(--accent);}
+.cb{display:grid;grid-template-columns:auto 1.6fr 1fr 1fr 1.4fr auto;gap:0;}
+.cb-rest{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.27rem;padding:.62rem .82rem;border-right:1px solid var(--panel-bdr);}
+.cb-rb{font-family:'Rajdhani',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--panel-bdr);color:var(--accent-l);padding:.25rem .5rem;border-radius:2px;cursor:pointer;width:100%;transition:all .2s;}
+.cb-rb:hover{background:rgba(46,109,164,.14);}
+.cb-rb.lg{color:var(--dgr);}
+.cb-pnl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.12rem;padding:.56rem .46rem;border-right:1px solid var(--panel-bdr);}
+.cb-pnl:last-child{border-right:none;}
+.cb-lbl{font-family:'Rajdhani',sans-serif;font-size:.49rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-l);}
+.cb-val{font-family:'Rajdhani',sans-serif;font-size:1.28rem;font-weight:700;color:var(--lbl);}
+.cb-sub{font-size:.59rem;color:var(--text-l);}
+.cb-in{width:100%;max-width:60px;text-align:center;background:transparent;border:none;border-bottom:1px solid var(--field-bdr);font-family:'Rajdhani',sans-serif;font-size:1.28rem;font-weight:700;color:var(--lbl);}
+.cb-in:focus{outline:none;border-bottom-color:var(--accent);}
+.cb-cm{display:flex;align-items:center;gap:.17rem;}
+.cb-cur{width:44px;text-align:center;background:transparent;border:none;border-bottom:1px solid var(--field-bdr);font-family:'Rajdhani',sans-serif;font-size:1.28rem;color:var(--lbl);}
+.cb-cur:focus{outline:none;border-bottom-color:var(--accent);}
+.cb-sep{color:var(--mgr);font-size:.92rem;}
+.cb-max{width:40px;text-align:center;background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:.83rem;color:var(--text-s);}
+.cb-max:focus{outline:none;border-color:var(--accent);}
+.cb-dt{display:flex;gap:.2rem;margin-top:.2rem;align-items:center;}
+.cb-di{width:40px;text-align:center;font-size:.78rem;padding:.15rem;background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;color:var(--text);}
+.cb-db{font-size:.68rem;padding:.15rem .4rem;background:transparent;border:1px solid var(--field-bdr);border-radius:2px;cursor:pointer;color:var(--text-s);}
+.cb-db:hover{background:rgba(46,109,164,.12);}
+.res-lbl{font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:700;letter-spacing:.07em;color:var(--accent-l);}
+/* funding */
+.fund-btns{display:flex;flex-direction:column;gap:.17rem;width:100%;}
+.fund-btn{font-family:'Rajdhani',sans-serif;font-size:.57rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--panel-bdr);color:var(--text-l);padding:.18rem .36rem;border-radius:2px;cursor:pointer;transition:all .2s;text-align:center;}
+.fund-btn.funded.active{background:var(--grn);border-color:var(--grn);color:#fff;}
+.fund-btn.solvent.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.fund-btn.strapped.active{background:var(--red);border-color:var(--red);color:#fff;}
+.fund-btn.funded:hover{border-color:var(--grn);color:#4abe80;}
+.fund-btn.solvent:hover{border-color:var(--accent);color:var(--accent-l);}
+.fund-btn.strapped:hover{border-color:var(--red);color:#e07070;}
+.edge-box{display:none;background:rgba(122,26,26,.15);border:1px solid rgba(122,26,26,.4);border-radius:2px;padding:.36rem .52rem;margin-top:.38rem;font-size:.69rem;color:#e07070;line-height:1.38;}
+.edge-box strong{color:#f08080;font-family:'Rajdhani',sans-serif;letter-spacing:.05em;}
+.edge-box.show{display:block;}
+/* saves */
+.sv-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.68rem;}
+.sv-card{background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:2px;padding:.46rem .68rem;text-align:center;}
+.sv-n{font-family:'Rajdhani',sans-serif;font-size:.57rem;font-weight:700;letter-spacing:.12em;color:var(--text-l);text-transform:uppercase;}
+.sv-f{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:700;color:var(--accent-l);margin-top:.17rem;}
+.sv-d{font-size:.61rem;color:var(--text-l);}
+.dv-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.46rem;margin-top:.46rem;}
+.dv{background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:2px;padding:.36rem .56rem;text-align:center;}
+.dv-l{font-family:'Rajdhani',sans-serif;font-size:.52rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-l);}
+.dv-v{font-family:'Rajdhani',sans-serif;font-size:.86rem;font-weight:700;color:var(--lbl);margin-top:.09rem;}
+/* conditions */
+.cond-grid{display:flex;flex-wrap:wrap;gap:.27rem;}
+.cond-btn{font-family:'Rajdhani',sans-serif;font-size:.57rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:20px;color:var(--text-l);padding:.17rem .5rem;cursor:pointer;transition:all .17s;}
+.cond-btn:hover{border-color:var(--accent-l);color:var(--accent-l);}
+.cond-btn.active{background:rgba(122,26,26,.22);border-color:var(--red);color:#e08080;}
+.cond-btn.bloodied.active{background:rgba(122,80,0,.22);border-color:#8B4500;color:#e09060;}
+/* death saves */
+.ds-row{display:flex;gap:1.35rem;align-items:center;}
+.ds-group{display:flex;flex-direction:column;align-items:center;gap:.21rem;}
+.ds-lbl{font-family:'Rajdhani',sans-serif;font-size:.57rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+.ds-lbl.sl{color:var(--grn);}
+.ds-lbl.fl{color:var(--red);}
+.ds-dots{display:flex;gap:.27rem;}
+.ds-dot{width:18px;height:18px;border-radius:50%;border:2px solid;cursor:pointer;transition:all .17s;}
+.ds-dot.success{border-color:var(--grn);background:transparent;}
+.ds-dot.success.filled{background:var(--grn);}
+.ds-dot.fail{border-color:var(--red);background:transparent;}
+.ds-dot.fail.filled{background:var(--red);}
+.ds-status{font-family:'Rajdhani',sans-serif;font-size:.73rem;font-weight:700;color:var(--text-l);margin-left:auto;}
+/* skills */
+.sk-budget{display:flex;gap:1.35rem;margin-bottom:.52rem;}
+.sk-bi{display:flex;flex-direction:column;align-items:center;gap:.07rem;}
+.sk-bn{font-family:'Rajdhani',sans-serif;font-size:1.02rem;font-weight:700;color:var(--lbl);}
+.sk-bn.ok{color:var(--grn);}
+.sk-bn.warn{color:#e05050;}
+.sk-bl{font-family:'Rajdhani',sans-serif;font-size:.49rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-l);}
+.sk-cap{font-family:'Rajdhani',sans-serif;font-size:.55rem;color:var(--text-l);margin-bottom:.36rem;}
+.sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.27rem;}
+.sk-row{display:flex;align-items:center;gap:.3rem;padding:.19rem .36rem;background:var(--lgr);border-radius:2px;border:1px solid rgba(46,109,164,.1);}
+.sk-name{flex:1;font-size:.77rem;color:var(--text-s);}
+.sk-stat{font-family:'Rajdhani',sans-serif;font-size:.49rem;font-weight:600;color:var(--text-l);width:25px;text-align:center;padding:.07rem .17rem;background:rgba(46,109,164,.1);border-radius:2px;}
+.sk-pts{width:31px;text-align:center;background:transparent;border:1px solid var(--field-bdr);border-radius:2px;font-size:.78rem;color:var(--lbl);padding:.05rem;}
+.sk-pts:focus{outline:none;border-color:var(--accent);}
+.sk-tot{font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;color:var(--accent-l);width:23px;text-align:right;}
+/* powers */
+.pwr-cls-sec{display:none;}
+.pwr-cls-sec.show{display:block;}
+.pwr-acc{border:1px solid var(--panel-bdr);border-radius:3px;margin-bottom:.42rem;overflow:hidden;}
+.pwr-acc-hd{background:var(--lgr);padding:.36rem .7rem;display:flex;align-items:center;gap:.46rem;cursor:pointer;user-select:none;}
+.pwr-acc-hd:hover{background:rgba(46,109,164,.08);}
+.pwr-acc-title{font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--lbl);flex:1;}
+.pwr-acc-count{font-family:'Rajdhani',sans-serif;font-size:.61rem;color:var(--accent-l);padding:.07rem .36rem;background:rgba(46,109,164,.15);border-radius:10px;}
+.pwr-acc-chev{color:var(--text-l);font-size:.61rem;transition:transform .17s;}
+.pwr-acc.collapsed .pwr-acc-chev{transform:rotate(-90deg);}
+.pwr-acc.collapsed .pwr-acc-body{display:none;}
+.pwr-acc-body{padding:.42rem .7rem;display:flex;flex-direction:column;gap:.17rem;}
+.pwr-item{display:flex;align-items:flex-start;gap:.36rem;padding:.2rem .3rem;border-radius:2px;transition:background .14s;}
+.pwr-item:hover{background:rgba(46,109,164,.05);}
+.pwr-chk{width:14px;height:14px;flex-shrink:0;margin-top:.11rem;accent-color:var(--accent);cursor:pointer;}
+.pwr-cost{font-family:'Rajdhani',sans-serif;font-size:.56rem;font-weight:700;min-width:25px;text-align:center;padding:.07rem .21rem;border-radius:2px;flex-shrink:0;}
+.pwr-cost.vp{background:rgba(107,63,170,.25);color:#c08eff;border:1px solid rgba(107,63,170,.3);}
+.pwr-cost.gp{background:rgba(139,106,16,.25);color:#e0b840;border:1px solid rgba(139,106,16,.3);}
+.pwr-cost.tp{background:rgba(46,109,164,.25);color:var(--accent-l);border:1px solid rgba(46,109,164,.3);}
+.pwr-cost.no{background:rgba(74,90,106,.2);color:var(--mgr);border:1px solid rgba(74,90,106,.2);}
+.pwr-cost.aug{background:rgba(107,63,170,.15);color:#a07edd;border:1px solid rgba(107,63,170,.2);font-size:.49rem;}
+.pwr-info{flex:1;min-width:0;}
+.pwr-name{font-size:.79rem;font-weight:500;color:var(--text-s);}
+.pwr-at{font-family:'Rajdhani',sans-serif;font-size:.52rem;color:var(--text-l);letter-spacing:.04em;}
+.pwr-desc{font-size:.71rem;color:var(--text-l);line-height:1.34;margin-top:.07rem;}
+/* slot tracker */
+.slot-track{display:flex;align-items:center;gap:.68rem;padding:.46rem .7rem;background:rgba(46,109,164,.06);border:1px solid rgba(46,109,164,.2);border-radius:2px;margin-bottom:.52rem;flex-wrap:wrap;}
+.slot-lbl{font-family:'Rajdhani',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-l);}
+.slot-ok{color:var(--grn);}
+.slot-warn{color:#e05050;}
+.slot-norm{color:var(--accent-l);}
+/* loadout */
+.loadout-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.27rem;margin-bottom:.46rem;}
+.lo-item{display:flex;align-items:flex-start;gap:.3rem;padding:.27rem .4rem;background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:2px;cursor:pointer;transition:border-color .17s;}
+.lo-item:hover{border-color:var(--accent-l);}
+.lo-item input[type=radio]{accent-color:var(--accent);margin-top:.13rem;flex-shrink:0;}
+.lo-info{flex:1;min-width:0;}
+.lo-name{font-size:.77rem;font-weight:500;color:var(--text-s);}
+.lo-def{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--accent-l);font-weight:700;}
+.lo-note{font-size:.67rem;color:var(--text-l);}
+/* archetype feature cards */
+.arc-card{background:rgba(46,109,164,.06);border:1px solid rgba(46,109,164,.2);border-radius:2px;padding:.43rem .62rem;margin-bottom:.3rem;}
+.arc-lv{font-family:'Rajdhani',sans-serif;font-size:.57rem;font-weight:700;letter-spacing:.09em;color:var(--accent-l);text-transform:uppercase;}
+.arc-name{font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:700;color:var(--lbl);margin:.07rem 0 .11rem;}
+.arc-desc{font-size:.74rem;color:var(--text-s);line-height:1.41;}
+/* progression table */
+.prog-table{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:.36rem;}
+.prog-table th{font-family:'Rajdhani',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-l);padding:.27rem .46rem;border-bottom:2px solid var(--accent);text-align:left;}
+.prog-table td{padding:.27rem .46rem;border-bottom:1px solid rgba(46,109,164,.1);vertical-align:top;color:var(--text-s);}
+.prog-table tr:hover td{background:rgba(46,109,164,.04);}
+.prog-lv{font-family:'Rajdhani',sans-serif;font-size:.67rem;font-weight:700;color:var(--accent-l);}
+/* actions table */
+.am-tbl{width:100%;border-collapse:collapse;font-size:.77rem;margin-top:.27rem;}
+.am-tbl th{font-family:'Rajdhani',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-l);padding:.27rem .46rem;border-bottom:2px solid var(--accent);text-align:left;}
+.am-tbl td{padding:.25rem .46rem;border-bottom:1px solid rgba(46,109,164,.08);vertical-align:top;}
+.am-tbl tr:hover td{background:rgba(46,109,164,.04);}
+.am-name{font-weight:600;color:var(--lbl);}
+.am-cost{font-family:'Rajdhani',sans-serif;font-size:.67rem;color:var(--accent-l);}
+.am-type{font-family:'Rajdhani',sans-serif;font-size:.62rem;color:var(--text-l);}
+.am-desc{color:var(--text-s);}
+.am-src{font-family:'Rajdhani',sans-serif;font-size:.52rem;color:var(--mgr);background:rgba(46,109,164,.1);padding:.03rem .2rem;border-radius:2px;}
+.am-add-btn{font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px dashed rgba(46,109,164,.3);color:var(--accent-l);padding:.27rem .86rem;border-radius:2px;cursor:pointer;margin-top:.36rem;transition:all .17s;}
+.am-add-btn:hover{background:rgba(46,109,164,.08);}
+.am-del-btn{font-size:.59rem;padding:.07rem .25rem;background:transparent;border:1px solid rgba(122,26,26,.35);border-radius:2px;cursor:pointer;color:#e07070;}
+.am-form{background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:2px;padding:.52rem;margin-top:.27rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:.3rem;}
+.am-form-full{grid-column:1/-1;}
+.am-form input,.am-form textarea,.am-form select{background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;padding:.19rem .36rem;font-family:'Barlow',sans-serif;font-size:.79rem;color:var(--text);width:100%;}
+.am-form textarea{resize:vertical;min-height:44px;}
+.am-form-btns{grid-column:1/-1;display:flex;gap:.3rem;justify-content:flex-end;}
+.am-form-ok{font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;background:var(--nav);border:1px solid var(--accent);color:var(--lbl);padding:.25rem .7rem;border-radius:2px;cursor:pointer;}
+.am-form-cancel{font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;background:transparent;border:1px solid var(--panel-bdr);color:var(--text-l);padding:.25rem .7rem;border-radius:2px;cursor:pointer;}
+/* weapons */
+.wpn-tbl{width:100%;border-collapse:collapse;font-size:.77rem;}
+.wpn-tbl th{font-family:'Rajdhani',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-l);padding:.27rem .4rem;border-bottom:2px solid var(--accent);text-align:left;}
+.wpn-tbl td{padding:.19rem .3rem;border-bottom:1px solid rgba(46,109,164,.08);}
+.wpn-tbl input,.wpn-tbl select{background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;padding:.15rem .27rem;font-family:'Barlow',sans-serif;font-size:.77rem;color:var(--text);width:100%;}
+/* consumables */
+.cons-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.68rem;}
+.cons-item{background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:3px;padding:.5rem .68rem;display:flex;align-items:center;gap:.46rem;}
+.cons-name{flex:1;font-size:.77rem;color:var(--text-s);line-height:1.33;}
+.cons-qty{display:flex;align-items:center;gap:.17rem;}
+.cons-qty button{width:20px;height:20px;font-size:.68rem;border:1px solid var(--field-bdr);background:var(--field-bg);border-radius:2px;cursor:pointer;color:var(--text-s);display:flex;align-items:center;justify-content:center;}
+.cons-qty button:hover{border-color:var(--accent);}
+.cons-qty span{min-width:17px;text-align:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;color:var(--accent-l);}
+/* faction */
+.fac-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.3rem;}
+.fac-row{display:flex;align-items:center;gap:.46rem;background:var(--lgr);border:1px solid var(--panel-bdr);border-radius:2px;padding:.27rem .46rem;}
+.fac-name{flex:1;font-size:.77rem;color:var(--text-s);}
+.fac-in{width:52px;text-align:center;background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:.79rem;color:var(--lbl);padding:.07rem;}
+.fac-in:focus{outline:none;border-color:var(--accent);}
+.fac-st{font-family:'Rajdhani',sans-serif;font-size:.57rem;min-width:46px;text-align:center;font-weight:600;}
+/* notes */
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:.78rem;}
+.note-box{background:rgba(13,24,41,.8);border-radius:3px;border:1px solid var(--panel-bdr);}
+.note-hd{background:var(--nav);border-left:3px solid var(--accent);padding:.36rem .7rem;font-family:'Rajdhani',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--lbl);}
+.note-body{padding:.46rem .6rem;}
+.note-ta{background:var(--field-bg);border:1px solid var(--field-bdr);border-radius:2px;padding:.3rem .46rem;font-family:'Barlow',sans-serif;font-size:.82rem;color:var(--text);width:100%;min-height:92px;resize:vertical;line-height:1.5;}
+.note-ta:focus{outline:none;border-color:var(--accent);}
+/* info boxes */
+.ib{background:rgba(46,109,164,.08);border:1px solid rgba(46,109,164,.2);border-radius:2px;padding:.36rem .6rem;font-size:.76rem;color:var(--text-s);margin-top:.36rem;line-height:1.43;}
+.ib strong{color:var(--accent-l);}
+.ib.autom{background:rgba(26,122,90,.06);border-color:rgba(26,122,90,.3);}
+.ib.autom strong{color:#60d4a0;}
+/* damage type badges */
+.dt{display:inline-flex;align-items:center;gap:.17rem;padding:.05rem .27rem;border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:.59rem;font-weight:700;letter-spacing:.04em;}
+.dt.k{background:rgba(74,90,106,.2);color:#8aa0b4;border:1px solid rgba(74,90,106,.3);}
+.dt.e{background:rgba(139,106,16,.15);color:#c8a030;border:1px solid rgba(139,106,16,.25);}
+.dt.i{background:rgba(26,122,90,.15);color:#40c090;border:1px solid rgba(26,122,90,.25);}
+.dt.v{background:rgba(107,63,170,.15);color:#c08eff;border:1px solid rgba(107,63,170,.25);}
+/* void alignment */
+.align-btns{display:flex;gap:.3rem;margin-bottom:.46rem;}
+.align-btn{font-family:'Rajdhani',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:transparent;border:1px solid var(--panel-bdr);color:var(--text-l);padding:.21rem .6rem;border-radius:2px;cursor:pointer;flex:1;text-align:center;transition:all .17s;}
+.align-btn.white.active{background:rgba(214,232,245,.13);border-color:var(--lbl);color:var(--lbl);}
+.align-btn.grey.active{background:rgba(74,90,106,.22);border-color:var(--mgr);color:var(--dgr);}
+.align-btn.black.active{background:rgba(107,63,170,.18);border-color:var(--void-c);color:#c08eff;}
+.upcast-box{background:rgba(107,63,170,.08);border:1px solid rgba(107,63,170,.2);border-radius:2px;padding:.36rem .6rem;font-size:.72rem;color:var(--text-s);margin-bottom:.46rem;line-height:1.41;}
+.upcast-box strong{color:#c08eff;font-family:'Rajdhani',sans-serif;letter-spacing:.04em;}
+@media(max-width:820px){
+  .ab-grid,.sv-row{grid-template-columns:repeat(2,1fr);}
+  .sk-grid{grid-template-columns:1fr 1fr;}
+  .g4{grid-template-columns:1fr 1fr;}
+  .g3{grid-template-columns:1fr 1fr;}
+  .notes-grid,.cons-row,.fac-grid,.dv-row{grid-template-columns:1fr;}
+  .cb{grid-template-columns:auto 1fr 1fr;}
+  .loadout-grid{grid-template-columns:1fr;}
+}
+@media print{
+  .tab-nav{display:none!important;}
+  .page{display:none!important;padding:.4rem!important;}
+  .page.active{display:block!important;}
+  body{background:#fff!important;color:#111!important;font-size:8.5pt;}
+  .s{border:1px solid #bbd!important;background:#f4f7fc!important;page-break-inside:avoid;}
+  .s-hd{background:#1B2A4A!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  input,select,textarea{border:1px solid #bbb!important;background:#fff!important;color:#111!important;}
+  .pwr-item{page-break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<nav class="tab-nav">
+  <div class="nav-brand">ESSENT<span>Agent Dossier v2</span></div>
+  <button class="tab-btn active" data-tab="dossier">Dossier</button>
+  <button class="tab-btn" data-tab="stats">Stats</button>
+  <button class="tab-btn" data-tab="skills">Skills</button>
+  <button class="tab-btn" data-tab="powers">Powers</button>
+  <button class="tab-btn" data-tab="gear">Gear</button>
+  <button class="tab-btn" data-tab="notes">Notes</button>
+  <button class="nav-btn" id="save-btn">Save</button>
+  <span class="save-msg" id="save-msg">Saved ✓</span>
+  <button class="nav-btn" onclick="window.print()">Print</button>
+</nav>
+<!-- ══════ PAGE: DOSSIER ══════ -->
+<div id="page-dossier" class="page active">
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Identity</span></div>
+    <div class="s-body">
+      <div class="gr g3" style="margin-bottom:.62rem;">
+        <div class="fg"><label class="fl">Agent Name</label><input class="fi-b" style="font-size:1.22rem;font-family:'Rajdhani',sans-serif;font-weight:700;" data-save="name" id="char-name" placeholder="—"></div>
+        <div class="fg"><label class="fl">Level</label><input class="fi-b" style="font-size:1.22rem;text-align:center;font-family:'Rajdhani',sans-serif;font-weight:700;" type="number" min="1" max="10" value="1" data-save="level" id="char-level" oninput="updateAll()"></div>
+        <div class="fg"><label class="fl">Class</label>
+          <select class="fi" data-save="cls" id="char-cls" onchange="onClassChange()">
+            <option value="">— Select Class —</option>
+            <option value="Void User">Void User (d6 · VP)</option>
+            <option value="Gunslinger">Gunslinger (d8 · GP)</option>
+            <option value="Autom">Autom (d10 · TP)</option>
+          </select>
+        </div>
+      </div>
+      <div class="gr g4">
+        <div class="fg"><label class="fl">Species</label>
+          <select class="fi" data-save="species" id="char-species" onchange="onSpeciesChange()">
+            <option value="">— Species —</option>
+            <optgroup label="Common Humanoid">
+              <option>Adaptis</option><option>Iridani</option><option>Vareeshan</option>
+              <option>Lekari</option><option>Solari</option><option>Thalassian</option>
+            </optgroup>
+            <optgroup label="Exotic Humanoid">
+              <option>Gravnok</option><option>Bellari</option><option>Scrappin</option><option>Drakari</option>
+            </optgroup>
+            <optgroup label="Autom Model">
+              <option>Lexicon Autom</option><option>Aegis Autom</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Archetype</label>
+          <select class="fi" data-save="archetype" id="char-archetype" onchange="onArchetypeChange()">
+            <option value="">— Archetype —</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Background</label>
+          <select class="fi" data-save="bg" id="char-bg" onchange="onBgChange()">
+            <option value="">— Background —</option>
+            <option>Cartel Criminal</option><option>Ex-Imperial</option><option>Soldier</option>
+            <option>Nobility</option><option>Spacer</option><option>Servant / Urchin</option>
+            <option>Bounty Hunter</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">XP / Milestones</label><input class="fi" type="text" data-save="xp" placeholder="—"></div>
+      </div>
+      <div class="gr g2" style="margin-top:.62rem;">
+        <div class="ib" id="species-box" style="min-height:46px;margin-top:0;">Select a species to see your trait.</div>
+        <div class="ib" id="bg-box" style="min-height:46px;margin-top:0;">Select a background to see your feature.</div>
+      </div>
+      <div class="ib autom" id="autom-note" style="display:none;margin-top:.48rem;">
+        <strong>Autom Baseline (all Autom species):</strong> Immune to Frightened + Void psychological effects. Vulnerable to Ion (+1d8 on all Ion attacks). Use <em>Mechanics</em> (not Treat Injury) for healing. DC 13 Fort save each hour without power after 24 hrs.
+      </div>
+      <div class="ib" id="start-gear-box" style="display:none;margin-top:.48rem;">
+        <strong>Starting Equipment:</strong> <span id="start-gear-text"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Funding State</span><span class="s-note">Governs downtime access · NPC attitudes · Strapped Edge in combat</span></div>
+    <div class="s-body">
+      <div class="gr g2">
+        <div>
+          <div class="fund-btns">
+            <button class="fund-btn funded" data-fund="funded">▲ Funded</button>
+            <button class="fund-btn solvent active" data-fund="solvent">◆ Solvent</button>
+            <button class="fund-btn strapped" data-fund="strapped">▼ Strapped</button>
+          </div>
+          <div class="edge-box" id="edge-box"><strong>⚡ STRAPPED EDGE —</strong> Once per combat: treat a Glancing Blow (≤12) as a Solid Hit. +1 VP/GP/TP at start of each combat.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.3rem;font-size:.74rem;">
+          <div style="padding:.33rem .52rem;background:rgba(26,107,60,.08);border:1px solid rgba(26,107,60,.2);border-radius:2px;color:var(--text-s);"><strong style="color:#4abe80;font-family:'Rajdhani',sans-serif;">FUNDED —</strong> All downtime. Faction brokering Advantage. Full service access. NPCs assume competence.</div>
+          <div style="padding:.33rem .52rem;background:rgba(46,109,164,.08);border:1px solid rgba(46,109,164,.2);border-radius:2px;color:var(--text-s);"><strong style="color:var(--accent-l);font-family:'Rajdhani',sans-serif;">SOLVENT —</strong> Standard downtime. Normal NPC relations. Training and research available.</div>
+          <div style="padding:.33rem .52rem;background:rgba(122,26,26,.08);border:1px solid rgba(122,26,26,.2);border-radius:2px;color:var(--text-s);"><strong style="color:#e07070;font-family:'Rajdhani',sans-serif;">STRAPPED —</strong> Faction Work + Personal Quest only. −1 Persuasion (high society). +1 Persuasion (criminals/underworld).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Faction Standings</span><span class="s-note">−3 Hated · 0 Neutral · +3 Ally · Social checks modified by standing</span></div>
+    <div class="s-body">
+      <div class="fac-grid">
+        <div class="fac-row"><span class="fac-name">Harmonium Ascendancy</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-ascend" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">Obsidian Creed</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-creed" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">Syndicate Nine</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-synd" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">Concord of Free Worlds</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-concord" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">Voidborn Choir</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-choir" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">The Fracture</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-fracture" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><span class="fac-name">Starbreaker Union</span><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-union" oninput="updFS(this)"><span class="fac-st">Neutral</span></div>
+        <div class="fac-row"><input class="fac-in" style="width:100%;flex:1;font-size:.75rem;background:transparent;border:none;border-bottom:1px solid var(--field-bdr);color:var(--text);" type="text" data-save="fac-cust-name" placeholder="Custom Faction…"><input class="fac-in" type="number" min="-3" max="3" value="0" data-save="fac-cust" oninput="updFS(this)" style="margin-left:.38rem;"><span class="fac-st">Neutral</span></div>
+      </div>
+      <div class="gr g2" style="margin-top:.62rem;">
+        <div class="fg"><label class="fl">Reputation Tags</label><input class="fi" type="text" data-save="rep-tags" placeholder="Heroic, Feared, Infamous, Loyalist, Mercenary…"></div>
+        <div class="fg"><label class="fl">Appearance / Callsign</label><input class="fi" type="text" data-save="appearance" placeholder="—"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE: STATS ══════ -->
+<div id="page-stats" class="page">
+  <div class="cb-wrap">
+    <div class="cb">
+      <div class="cb-rest">
+        <button class="cb-rb" onclick="shortRest()">Short<br>Rest</button>
+        <button class="cb-rb lg" onclick="longRest()">Long<br>Rest</button>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:.49rem;color:var(--text-l);text-align:center;margin-top:.17rem;">Short: ½HP+½Res<br>1×/long rest<br>Long: Full all</div>
+      </div>
+      <div class="cb-pnl">
+        <div class="cb-lbl">Hit Points</div>
+        <div class="cb-cm">
+          <input class="cb-cur" id="hp-cur" type="number" value="0" data-save="hp-cur" oninput="updBlooded()">
+          <span class="cb-sep">/</span>
+          <input class="cb-max" id="hp-max" type="number" value="0" data-save="hp-max" oninput="updBlooded();updateAll()">
+        </div>
+        <div class="cb-sub" id="bloodied-lbl">Bloodied at 0</div>
+        <div class="cb-dt">
+          <input class="cb-di" id="hp-amt" type="number" min="0" value="0" placeholder="Amt">
+          <button class="cb-db" onclick="applyHP(1)">+</button>
+          <button class="cb-db" onclick="applyHP(-1)">−</button>
+        </div>
+      </div>
+      <div class="cb-pnl">
+        <div class="cb-lbl">Defense</div>
+        <div class="cb-val" id="def-val">—</div>
+        <div class="cb-sub" id="def-note">REF mod only</div>
+        <div id="armor-row" style="display:none;align-items:center;gap:.2rem;margin-top:.2rem;">
+          <span style="font-size:.56rem;color:var(--text-l)">+Arm:</span>
+          <input class="cb-di" id="armor-bonus" type="number" value="0" min="0" max="10" data-save="armor-bonus" style="width:34px" oninput="updateAll()">
+        </div>
+      </div>
+      <div class="cb-pnl">
+        <div class="cb-lbl">Initiative</div>
+        <div class="cb-val" id="init-val">1d10+0</div>
+        <div class="cb-sub">1d10 + REF mod</div>
+      </div>
+      <div class="cb-pnl" style="min-width:122px;">
+        <div class="res-lbl" id="res-label">— Resource</div>
+        <div class="cb-cm">
+          <input class="cb-cur" id="res-cur" type="number" value="0" data-save="res-cur">
+          <span class="cb-sep">/</span>
+          <input class="cb-max" id="res-max" type="number" value="0" data-save="res-max" style="width:44px">
+        </div>
+        <div class="cb-sub" id="res-gov">Select a class</div>
+        <div class="cb-dt">
+          <input class="cb-di" id="res-amt" type="number" min="0" value="0">
+          <button class="cb-db" onclick="applyRes(1)">+</button>
+          <button class="cb-db" onclick="applyRes(-1)">−</button>
+        </div>
+      </div>
+      <div class="cb-pnl" style="padding:.46rem .56rem;">
+        <div class="cb-lbl">Funding</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:.83rem;font-weight:700;" id="cb-fund">◆ Solvent</div>
+        <div class="edge-box" id="cb-edge" style="margin-top:.22rem;padding:.19rem .28rem;font-size:.58rem;">⚡ EDGE active</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Ability Scores</span><span class="s-note">Quick build: all start at 12, raise one to 16, lower another by same amount</span></div>
+    <div class="s-body">
+      <div class="ab-grid">
+        <div class="ab-card fc">
+          <div class="ab-n">Fortitude</div>
+          <input class="ab-sc" id="sc-for" type="number" min="1" max="20" value="10" data-save="sc-for" oninput="updateAll()">
+          <div class="ab-md" id="md-for">+0</div>
+          <div class="ab-sv" id="sv-for">Fort: 2d10+0</div>
+          <div class="ab-gv">Melee ATK · HP · Fort Save</div>
+        </div>
+        <div class="ab-card rc">
+          <div class="ab-n">Reflex</div>
+          <input class="ab-sc" id="sc-ref" type="number" min="1" max="20" value="10" data-save="sc-ref" oninput="updateAll()">
+          <div class="ab-md" id="md-ref">+0</div>
+          <div class="ab-sv" id="sv-ref">Reflex: 2d10+0</div>
+          <div class="ab-gv">Ranged ATK · DEF · Initiative</div>
+        </div>
+        <div class="ab-card ic">
+          <div class="ab-n">Intellect</div>
+          <input class="ab-sc" id="sc-int" type="number" min="1" max="20" value="10" data-save="sc-int" oninput="updateAll()">
+          <div class="ab-md" id="md-int">+0</div>
+          <div class="ab-sv" id="sv-int">INT checks</div>
+          <div class="ab-gv">Skills · TP Pool (Autom)</div>
+        </div>
+        <div class="ab-card pc">
+          <div class="ab-n">Presence</div>
+          <input class="ab-sc" id="sc-pre" type="number" min="1" max="20" value="10" data-save="sc-pre" oninput="updateAll()">
+          <div class="ab-md" id="md-pre">+0</div>
+          <div class="ab-sv" id="sv-pre">Will: 2d10+0</div>
+          <div class="ab-gv">Social · VP / GP · Will Save</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Saving Throws &amp; Derived Stats</span></div>
+    <div class="s-body">
+      <div class="sv-row">
+        <div class="sv-card"><div class="sv-n">Fortitude Save</div><div class="sv-f" id="fort-sv">2d10+0</div><div class="sv-d">Physical force · toxins · knockback · explosions</div></div>
+        <div class="sv-card"><div class="sv-n">Reflex Save</div><div class="sv-f" id="ref-sv">2d10+0</div><div class="sv-d">Area effects · traps · evasion · Grapple escape</div></div>
+        <div class="sv-card"><div class="sv-n">Will Save</div><div class="sv-f" id="will-sv">2d10+0</div><div class="sv-d">Void powers · Fear · mental influence · Social DC</div></div>
+      </div>
+      <div class="dv-row">
+        <div class="dv"><div class="dv-l">Melee Attack</div><div class="dv-v" id="melee-atk">2d10+0</div></div>
+        <div class="dv"><div class="dv-l">Ranged Attack</div><div class="dv-v" id="ranged-atk">2d10+0</div></div>
+        <div class="dv"><div class="dv-l">Scaling Threat DC</div><div class="dv-v" id="threat-dc">11</div></div>
+        <div class="dv"><div class="dv-l">Base HP (Level 1)</div><div class="dv-v" id="hp-ref">FOR + hit die</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Conditions</span><span class="s-note">Click to toggle · Bloodied = at or below 50% HP</span></div>
+    <div class="s-body">
+      <div class="cond-grid">
+        <button class="cond-btn" data-cond="Blinded">Blinded</button>
+        <button class="cond-btn bloodied" data-cond="Bloodied">Bloodied</button>
+        <button class="cond-btn" data-cond="Deafened">Deafened</button>
+        <button class="cond-btn" data-cond="Distracted">Distracted</button>
+        <button class="cond-btn" data-cond="Frightened">Frightened</button>
+        <button class="cond-btn" data-cond="Grappled">Grappled</button>
+        <button class="cond-btn" data-cond="Invisible">Invisible</button>
+        <button class="cond-btn" data-cond="Paralyzed">Paralyzed</button>
+        <button class="cond-btn" data-cond="Petrified">Petrified</button>
+        <button class="cond-btn" data-cond="Poisoned">Poisoned</button>
+        <button class="cond-btn" data-cond="Prone">Prone</button>
+        <button class="cond-btn" data-cond="Restrained">Restrained</button>
+        <button class="cond-btn" data-cond="Staggered">Staggered</button>
+        <button class="cond-btn" data-cond="Stunned">Stunned</button>
+        <button class="cond-btn" data-cond="Unconscious">Unconscious</button>
+      </div>
+      <div style="margin-top:.7rem;padding-top:.7rem;border-top:1px solid var(--panel-bdr);">
+        <div class="fl" style="margin-bottom:.36rem;">Death Saving Throws — 1d20 (rolled privately) · 3 successes = stable · 3 failures = dead · Natural 20 = regain 1 HP</div>
+        <div class="ds-row">
+          <div class="ds-group">
+            <div class="ds-lbl sl">Successes</div>
+            <div class="ds-dots" id="ds-s">
+              <button class="ds-dot success" onclick="toggleDS(this)"></button>
+              <button class="ds-dot success" onclick="toggleDS(this)"></button>
+              <button class="ds-dot success" onclick="toggleDS(this)"></button>
+            </div>
+          </div>
+          <div class="ds-group">
+            <div class="ds-lbl fl">Failures</div>
+            <div class="ds-dots" id="ds-f">
+              <button class="ds-dot fail" onclick="toggleDS(this)"></button>
+              <button class="ds-dot fail" onclick="toggleDS(this)"></button>
+              <button class="ds-dot fail" onclick="toggleDS(this)"></button>
+            </div>
+          </div>
+          <div class="ds-status" id="ds-status">—</div>
+          <button class="am-add-btn" onclick="clearDS()" style="margin-top:0;padding:.19rem .58rem;">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE: SKILLS ══════ -->
+<div id="page-skills" class="page">
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Skill Point Budget</span></div>
+    <div class="s-body">
+      <div class="sk-budget">
+        <div class="sk-bi"><div class="sk-bn" id="sk-per-lv">1</div><div class="sk-bl">Per Level</div></div>
+        <div class="sk-bi"><div class="sk-bn" id="sk-total">5</div><div class="sk-bl">Total Budget</div></div>
+        <div class="sk-bi"><div class="sk-bn ok" id="sk-spent">0</div><div class="sk-bl">Spent</div></div>
+        <div class="sk-bi"><div class="sk-bn ok" id="sk-remain">5</div><div class="sk-bl">Remaining</div></div>
+        <div class="sk-bi"><div class="sk-bn" id="sk-max-rank">2</div><div class="sk-bl">Max Rank</div></div>
+      </div>
+      <div class="sk-cap">Max rank = Level + 1 · INT modifier skill points per level (min 1) · Automs gain +1 per level · +4 at Level 1</div>
+      <div class="ib" style="margin-top:.36rem;font-size:.72rem;"><strong>DC Scale:</strong> Routine 9–12 · Standard 13–16 · Hard 17–20 · Very Hard 21–25 · Extreme 26–29 · Legendary 30 · Check = 2d10 + Skill Rank + Ability Modifier</div>
+    </div>
+  </div>
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Skills</span></div>
+    <div class="s-body"><div class="sk-grid" id="skill-grid"></div></div>
+  </div>
+</div>
+
+<!-- ══════ PAGE: POWERS ══════ -->
+<div id="page-powers" class="page">
+  <div class="slot-track">
+    <span class="slot-lbl">Customization Slots</span>
+    <span style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;" class="slot-norm">Available: <strong id="slots-avail">2</strong></span>
+    <span style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;" class="slot-norm">Used: <strong id="slots-used">0</strong></span>
+    <span style="font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;"><strong id="slots-remain" class="slot-ok">2</strong> <span style="font-size:.63rem;color:var(--text-l);">remaining</span></span>
+    <span style="font-size:.67rem;color:var(--text-l);margin-left:auto;">2 at Level 1, +1/level · Loadout &amp; Chassis each cost 1 slot · checkboxes = known/equipped</span>
+  </div>
+
+  <!-- VOID USER SECTION -->
+  <div class="pwr-cls-sec" id="sec-void">
+    <div class="s">
+      <div class="s-hd"><span class="s-title">Void User Powers</span><span class="s-note" id="vp-disp">VP: — / —</span></div>
+      <div class="s-body">
+        <div style="margin-bottom:.46rem;">
+          <div class="fl" style="margin-bottom:.27rem;">Void Alignment</div>
+          <div class="align-btns">
+            <button class="align-btn white" onclick="setAlign(this)">☀ White Void</button>
+            <button class="align-btn grey active" onclick="setAlign(this)" data-save="void-align">◆ Grey (Balanced)</button>
+            <button class="align-btn black" onclick="setAlign(this)">● Black Hole</button>
+          </div>
+        </div>
+        <div class="upcast-box"><strong>UPCASTING —</strong> Double VP cost → double the primary effect: doubled damage dice, doubled duration, or doubled targets (GM approval for other applications). Void Heal 3 VP → 3d4+PRE; at 6 VP → 6d4+2×PRE mod.</div>
+        <div class="ib" style="margin:0 0 .44rem;font-size:.71rem;"><strong>Opposing alignment:</strong> Powers from your opposing alignment cost double VP and require a DC 13 Will Save or suffer a GM-determined drawback. Grey-aligned characters use all powers at normal cost.</div>
+        <div id="acc-white" class="pwr-acc"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">☀ White Void Powers</span><span class="pwr-acc-count" id="cnt-white">0 / 11</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-white"></div></div>
+        <div id="acc-black" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">● Black Hole Powers</span><span class="pwr-acc-count" id="cnt-black">0 / 10</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-black"></div></div>
+        <div id="acc-univ" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">◇ Universal Powers</span><span class="pwr-acc-count" id="cnt-univ">0 / 10</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-univ"></div></div>
+        <div id="acc-tech" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">⬡ Void Techniques — Passive (no VP cost, compete for slots)</span><span class="pwr-acc-count" id="cnt-tech">0 / 10</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-tech"></div></div>
+        <div id="acc-aff" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">◈ Void Affixes — Voidblade Upgrades</span><span class="pwr-acc-count" id="cnt-aff">0 / 10</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-aff"></div></div>
+        <div id="acc-aug" class="pwr-acc collapsed" style="display:none;"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">⬟ Void Augmentations — Conduit Archetype Only</span><span class="pwr-acc-count" id="cnt-aug">0 / 12</span><span class="pwr-acc-chev">▼</span></div>
+          <div style="padding:.32rem .7rem;background:rgba(107,63,170,.07);border-bottom:1px solid rgba(107,63,170,.2);font-size:.71rem;color:var(--text-s);">Augmentations add extra VP cost to a power to enhance it. Two Augmentations can be applied to the same power once per long rest (Level 4 feature). Gain 2 at Level 1, +1 at Levels 3, 5, 7, and 9.</div>
+          <div class="pwr-acc-body" id="body-aug"></div>
+        </div>
+        <div id="void-prog" style="margin-top:.7rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUNSLINGER SECTION -->
+  <div class="pwr-cls-sec" id="sec-gun">
+    <div class="s">
+      <div class="s-hd"><span class="s-title">Gunslinger Equipment</span><span class="s-note" id="gp-disp">GP: — / —</span></div>
+      <div class="s-body">
+        <div class="fl" style="margin-bottom:.3rem;">Defensive Loadout — choose one or none (costs 1 customization slot if not "none")</div>
+        <div class="loadout-grid">
+          <label class="lo-item"><input type="radio" name="def-load" value="0" checked data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">No Armor</div><div class="lo-note">+0 DEF · Full mobility · Costs no slot</div></div></label>
+          <label class="lo-item"><input type="radio" name="def-load" value="1" data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Infiltrator Weave</div><div class="lo-def">+1 DEF</div><div class="lo-note">No tradeoff · Advantage on all Stealth</div></div></label>
+          <label class="lo-item"><input type="radio" name="def-load" value="2" data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Combat Rig</div><div class="lo-def">+2 DEF</div><div class="lo-note">No tradeoff · Reliable protection baseline</div></div></label>
+          <label class="lo-item"><input type="radio" name="def-load" value="2d" data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Deflector Array</div><div class="lo-def">+2 DEF</div><div class="lo-note">Once/combat: Glancing Blow (≤12) → 0 damage</div></div></label>
+          <label class="lo-item"><input type="radio" name="def-load" value="3" data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Kinetic Dampener</div><div class="lo-def">+3 DEF</div><div class="lo-note">−5 ft. move · Resistance to Kinetic damage</div></div></label>
+          <label class="lo-item"><input type="radio" name="def-load" value="4" data-save="def-load" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Exo-Frame</div><div class="lo-def">+4 DEF</div><div class="lo-note">−10 ft. move · Cannot Dash/Hide as Bonus Action</div></div></label>
+        </div>
+        <div id="acc-blast" class="pwr-acc"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Blasters &amp; Firearms</span><span class="pwr-acc-count" id="cnt-blast">0 / 6</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-blast"></div></div>
+        <div id="acc-gadget" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Gadgets &amp; Utility</span><span class="pwr-acc-count" id="cnt-gadget">0 / 7</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-gadget"></div></div>
+        <div id="acc-expl" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Explosives &amp; Traps</span><span class="pwr-acc-count" id="cnt-expl">0 / 7</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-expl"></div></div>
+        <div style="margin-top:.46rem;">
+          <div class="fl" style="margin-bottom:.27rem;">Gunslinger Reaction — choose one (does not cost a customization slot)</div>
+          <div style="display:flex;flex-direction:column;gap:.17rem;">
+            <label class="lo-item"><input type="radio" name="gs-react" value="" checked data-save="gs-react"><div class="lo-info"><div class="lo-name">None selected</div></div></label>
+            <label class="lo-item"><input type="radio" name="gs-react" value="qd" data-save="gs-react"><div class="lo-info"><div class="lo-name">Quickdraw</div><span class="am-cost">2 GP · Reaction</span><div class="lo-note">Enemy enters melee range: ranged attack + step back 5 ft.</div></div></label>
+            <label class="lo-item"><input type="radio" name="gs-react" value="dr" data-save="gs-react"><div class="lo-info"><div class="lo-name">Dodge Roll</div><span class="am-cost">2 GP · Reaction</span><div class="lo-note">Move 10 ft. and impose Disadvantage on one incoming attack.</div></div></label>
+            <label class="lo-item"><input type="radio" name="gs-react" value="fc" data-save="gs-react"><div class="lo-info"><div class="lo-name">Flash Counter</div><span class="am-cost">3 GP · Reaction</span><div class="lo-note">When targeted: Blind the attacker until end of their next turn.</div></div></label>
+          </div>
+        </div>
+        <div id="gun-prog" style="margin-top:.7rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTOM SECTION -->
+  <div class="pwr-cls-sec" id="sec-autom">
+    <div class="s">
+      <div class="s-hd"><span class="s-title">Autom Modifications</span><span class="s-note" id="tp-disp">TP: — / —</span></div>
+      <div class="s-body">
+        <div class="fl" style="margin-bottom:.3rem;">Chassis Configuration — choose one or none (costs 1 customization slot if not "none") · Aegis Autom species +1 DEF stacks with chassis</div>
+        <div class="loadout-grid">
+          <label class="lo-item"><input type="radio" name="chassis" value="0" checked data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">No Configuration</div><div class="lo-note">+0 DEF · No tradeoffs · Costs no slot</div></div></label>
+          <label class="lo-item"><input type="radio" name="chassis" value="0s" data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Ghost Chassis</div><div class="lo-def">+0 DEF</div><div class="lo-note">+5 ft. movement · Advantage on Stealth</div></div></label>
+          <label class="lo-item"><input type="radio" name="chassis" value="2" data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Reinforced Plating</div><div class="lo-def">+2 DEF</div><div class="lo-note">−5 ft. movement · Reliable combat protection</div></div></label>
+          <label class="lo-item"><input type="radio" name="chassis" value="3" data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Adaptive Shielding</div><div class="lo-def">+3 DEF</div><div class="lo-note">Ion Vulnerable ×2 (doubles Synthetic Frame penalty)</div></div></label>
+          <label class="lo-item"><input type="radio" name="chassis" value="2v" data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Cortosis Weave</div><div class="lo-def">+2 DEF</div><div class="lo-note">Void Resistance · Voidblades deal ½ damage to you</div></div></label>
+          <label class="lo-item"><input type="radio" name="chassis" value="4" data-save="chassis" onchange="updateAll();updSlots()"><div class="lo-info"><div class="lo-name">Fortress Protocol</div><div class="lo-def">+4 DEF</div><div class="lo-note">Cannot Dash · +2 to all Fortitude saves</div></div></label>
+        </div>
+        <div id="acc-cm" class="pwr-acc"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Combat Modifications</span><span class="pwr-acc-count" id="cnt-cm">0 / 5</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-cm"></div></div>
+        <div id="acc-um" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Utility Modifications</span><span class="pwr-acc-count" id="cnt-um">0 / 7</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-um"></div></div>
+        <div id="acc-av" class="pwr-acc collapsed"><div class="pwr-acc-hd" onclick="togAcc(this)"><span class="pwr-acc-title">Anti-Void Modifications</span><span class="pwr-acc-count" id="cnt-av">0 / 3</span><span class="pwr-acc-chev">▼</span></div><div class="pwr-acc-body" id="body-av"></div></div>
+        <div style="margin-top:.46rem;">
+          <div class="fl" style="margin-bottom:.27rem;">Autom Reaction — choose one (does not cost a customization slot)</div>
+          <div style="display:flex;flex-direction:column;gap:.17rem;">
+            <label class="lo-item"><input type="radio" name="at-react" value="" checked data-save="at-react"><div class="lo-info"><div class="lo-name">None selected</div></div></label>
+            <label class="lo-item"><input type="radio" name="at-react" value="eo" data-save="at-react"><div class="lo-info"><div class="lo-name">Emergency Overload</div><span class="am-cost">2 TP · Reaction</span><div class="lo-note">Release a pulse: 1d6 Ion damage to all enemies within 5 ft.</div></div></label>
+            <label class="lo-item"><input type="radio" name="at-react" value="ds" data-save="at-react"><div class="lo-info"><div class="lo-name">Deflector Shield</div><span class="am-cost">2 TP · Reaction</span><div class="lo-note">Reduce incoming ranged attack damage by half.</div></div></label>
+            <label class="lo-item"><input type="radio" name="at-react" value="cs" data-save="at-react"><div class="lo-info"><div class="lo-name">Counter-Slice</div><span class="am-cost">3 TP · Reaction</span><div class="lo-note">When targeted by a hacking attempt, automatically redirect it to the attacker.</div></div></label>
+          </div>
+        </div>
+        <div id="autom-prog" style="margin-top:.7rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS REFERENCE -->
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Actions Reference</span><span class="s-note">Archetype base abilities auto-populated · add custom entries below</span></div>
+    <div class="s-body">
+      <table class="am-tbl">
+        <thead><tr><th style="width:20%">Name</th><th style="width:14%">Type</th><th style="width:10%">Cost</th><th>Description</th><th style="width:5%"></th></tr></thead>
+        <tbody id="am-auto"></tbody>
+        <tbody id="am-custom"></tbody>
+      </table>
+      <button class="am-add-btn" onclick="showAmForm()">+ Add Custom Action</button>
+      <div class="am-form" id="am-form" style="display:none;">
+        <div class="fg"><label class="fl">Name</label><input id="am-n" class="fi" type="text" placeholder="Ability name"></div>
+        <div class="fg"><label class="fl">Type</label>
+          <select id="am-t" class="fi"><option>Action</option><option>Bonus Action</option><option>Reaction</option><option>Passive</option><option>Once/Long Rest</option><option>Once/Short Rest</option></select>
+        </div>
+        <div class="fg"><label class="fl">Cost</label><input id="am-c" class="fi" type="text" placeholder="3 VP"></div>
+        <div class="fg am-form-full"><label class="fl">Description</label><textarea id="am-d" class="fi" rows="2" placeholder="Describe the effect…"></textarea></div>
+        <div class="am-form-btns am-form-full"><button class="am-form-cancel" onclick="hideAmForm()">Cancel</button><button class="am-form-ok" onclick="addAmRow()">Add</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE: GEAR ══════ -->
+<div id="page-gear" class="page">
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Weapons</span></div>
+    <div class="s-body" style="overflow-x:auto;">
+      <table class="wpn-tbl" style="min-width:630px;">
+        <thead><tr><th style="width:22%">Name</th><th style="width:11%">Damage</th><th style="width:12%">Type</th><th style="width:9%">Attr.</th><th style="width:11%">Rarity</th><th>Special / Notes</th></tr></thead>
+        <tbody id="wpn-tbody"></tbody>
+      </table>
+      <div class="ib" style="margin-top:.46rem;font-size:.71rem;line-height:1.58;">
+        <strong>Damage Types:</strong> &nbsp;
+        <span class="dt k">⬛ Kinetic</span> physical force, no bonus interactions &nbsp;·&nbsp;
+        <span class="dt e">⬟ Energy</span> flamers, cryo, blasters; env. resistance varies &nbsp;·&nbsp;
+        <span class="dt i">⬡ Ion</span> +1d8 vs. Automs &amp; mechanical systems &nbsp;·&nbsp;
+        <span class="dt v">⬢ Void</span> +1d6 vs. biological creatures<br>
+        <strong>Properties:</strong> Concealable (Security DC 14) · Reach (10 ft. incl. opportunity attacks) · Shoot/Swing Twice (bonus action: 1 extra attack, 1/round) · Augments (modifies held weapon's type or adds effect to attacks)
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Consumables</span></div>
+    <div class="s-body">
+      <div class="cons-row">
+        <div class="cons-item"><span class="cons-name"><strong>Medical Stim</strong><br><span style="font-size:.67rem;">Bonus Action · 1d6 HP · Does not work on Automs</span></span><div class="cons-qty"><button onclick="adjC('stims',-1)">−</button><span id="c-stims">2</span><button onclick="adjC('stims',1)">+</button></div></div>
+        <div class="cons-item"><span class="cons-name"><strong>Autom Repair Kit</strong><br><span style="font-size:.67rem;">Bonus Act · DC 11 Mechanics → 1d10 HP · Self only</span></span><div class="cons-qty"><button onclick="adjC('kits',-1)">−</button><span id="c-kits">2</span><button onclick="adjC('kits',1)">+</button></div></div>
+        <div class="cons-item"><span class="cons-name"><input class="fi-b" type="text" data-save="cons-c-name" placeholder="Custom consumable…" style="font-size:.74rem;width:100%;"><span style="font-size:.63rem;color:var(--text-l);">Custom</span></span><div class="cons-qty"><button onclick="adjC('other',-1)">−</button><span id="c-other">0</span><button onclick="adjC('other',1)">+</button></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s">
+    <div class="s-hd"><span class="s-title">Equipment &amp; Assets</span></div>
+    <div class="s-body">
+      <div class="gr g2">
+        <div style="display:flex;flex-direction:column;gap:.52rem;">
+          <div class="fg"><label class="fl">Gear, Items &amp; Special Equipment</label><textarea class="fi" rows="6" data-save="gear-items" placeholder="EMP Grenade ×2, Combat Rig, Comlink, Needlegun Augment, Thermal Detonator…"></textarea></div>
+          <div class="fg"><label class="fl">Active Void Affixes (voidblade)</label><input class="fi" type="text" data-save="gear-affixes" placeholder="Aetherite Affix (standard) · Solan Affix · Karnyx Affix…"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.52rem;">
+          <div class="fg"><label class="fl">Ship / Vehicle</label><input class="fi" type="text" data-save="gear-ship" placeholder="Ship name, tier, crew size, faction source…"></div>
+          <div class="fg"><label class="fl">Ship Modifications &amp; Station Roles</label><textarea class="fi" rows="4" data-save="gear-ship-mods" placeholder="Shield Emitter, Smuggler's Hold, Targeting Computer…&#10;Helm (Piloting/REF), Gunnery, Engineering, Sensors, Command"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PAGE: NOTES ══════ -->
+<div id="page-notes" class="page">
+  <div class="notes-grid">
+    <div class="note-box"><div class="note-hd">Backstory</div><div class="note-body"><textarea class="note-ta" data-save="note-back" rows="8" placeholder="Who were you before this? What brought you to the Fractured Reaches?"></textarea></div></div>
+    <div class="note-box"><div class="note-hd">Motivation &amp; Goals</div><div class="note-body"><textarea class="note-ta" data-save="note-motiv" rows="8" placeholder="What do you want? What would you sacrifice? What keeps you moving?"></textarea></div></div>
+    <div class="note-box"><div class="note-hd">Campaign Notes</div><div class="note-body"><textarea class="note-ta" data-save="note-camp" rows="8" placeholder="Mission logs, key events, open threads, current objective…"></textarea></div></div>
+    <div class="note-box"><div class="note-hd">NPC Contacts</div><div class="note-body"><textarea class="note-ta" data-save="note-npc" rows="8" placeholder="Name — relationship, location, what they want from you…"></textarea></div></div>
+    <div class="note-box"><div class="note-hd">Faction Notes</div><div class="note-body"><textarea class="note-ta" data-save="note-fac" rows="6" placeholder="Faction relationships, debts, favors owed, standing shifts…"></textarea></div></div>
+    <div class="note-box"><div class="note-hd">Miscellaneous</div><div class="note-body"><textarea class="note-ta" data-save="note-misc" rows="6" placeholder="Anything else…"></textarea></div></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const LS = 'essent_dossier_v2';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  DATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SPECIES = {
+  Adaptis:'<strong>Adaptive Talent</strong> — Gain an additional +1 Skill Point at character creation.',
+  Iridani:'<strong>Unyielding Resolve</strong> — Once per long rest, reroll a Will saving throw.',
+  Vareeshan:'<strong>Pack Hunter</strong> — Advantage on Awareness checks when near at least one ally.',
+  Lekari:'<strong>Cunning Linguist</strong> — Gain +1 Faction Standing with one native faction of choice at creation.',
+  Solari:'<strong>Disciplined Focus</strong> — Once per long rest, Advantage on any check requiring concentration or precision.',
+  Thalassian:'<strong>Aquatic Adaptation</strong> — Breathe air and water. Advantage on swimming-related checks.',
+  Gravnok:"<strong>Underworld Authority</strong> — Once per session, auto-succeed on a Persuasion check with criminals or those who fear Gravnoks.",
+  Bellari:'<strong>Bellowing Voice</strong> — Once per long rest, emit a sonic bellow. Nearby enemies Fort save or knocked prone and deafened.',
+  Scrappin:"<strong>Scavenger's Eye</strong> — Advantage on Mechanics or Security checks to find, repair, or dismantle technology.",
+  Drakari:'<strong>Berserker Resilience</strong> — Once per long rest, reduce incoming damage from one attack by half.',
+  'Lexicon Autom':'<strong>Linguistic Database</strong> — All Factions begin initially Neutral or better toward you.',
+  'Aegis Autom':'<strong>Armored Casing</strong> — Base Defense Score increases by +1. Stacks with any Chassis Configuration.'
+};
+const BG = {
+  'Cartel Criminal':{sk:'Persuasion +1, Security +1',feat:"<strong>Underworld Ties</strong> — Always find a safehouse, black-market dealer, or bounty broker, even in Imperial-controlled territories."},
+  'Ex-Imperial':{sk:'Computer Use +1, Persuasion +1',feat:'<strong>Former Allegiance</strong> — Know Imperial protocols, forge access codes, Advantage on Persuasion when impersonating an Imperial.'},
+  'Soldier':{sk:'Demolitions +1, Athletics +1',feat:'<strong>Combat Veteran</strong> — Assess enemy formations; reduce ambush effectiveness; allies gain Advantage on initiative in battles you prepare for.'},
+  'Nobility':{sk:'Investigation +1, Awareness +1',feat:'<strong>Privileged Status</strong> — Access to high society, audiences with rulers; rarely searched at checkpoints.'},
+  'Spacer':{sk:'Piloting +1, Mechanics +1',feat:'<strong>Well-Traveled</strong> — Know star charts and hidden routes. Always secure ship passage and safe harbors.'},
+  'Servant / Urchin':{sk:'Treat Injury +1, Stealth +1',feat:'<strong>Overlooked Presence</strong> — Advantage on checks to blend into crowds or move unnoticed.'},
+  'Bounty Hunter':{sk:'Security +1, Awareness +1',feat:"<strong>Bounty Board Access</strong> — Always find postings and employers. Understand the customs of the trade."}
+};
+const CLS = {
+  'Void User':{die:6,res:'VP',lbl:'VP · Void Points',gov:'pre',govLbl:'Governed by PRE score'},
+  'Gunslinger':{die:8,res:'GP',lbl:'GP · Grit Points',gov:'pre',govLbl:'Governed by PRE score'},
+  'Autom':{die:10,res:'TP',lbl:'TP · Tech Points',gov:'int',govLbl:'Governed by INT score'}
+};
+const START_GEAR = {
+  'Void User':'Voidblade (2d8 Void, Aetherite Affix), Spacer Clothes, 2× Medical Stim, Comlink.',
+  'Gunslinger':'Choice of Holdout Blaster or Blaster Rifle, Vibroknife, optional Defensive Loadout (1 slot), 1× Gunslinger Equipment choice, 2× Medical Stim.',
+  'Autom':'One Common weapon of choice, optional Chassis Configuration (1 slot), 2× Autom Repair Kit, Integrated Comlink (Security DC 16 to remove).'
+};
+const ARCS = {
+  'Void User':['Grey Essent','Essent Guardian','Dark Marauder','Essent Conduit'],
+  'Gunslinger':['Smuggler','Bounty Hunter','Sharpshooter','CQC Operative'],
+  'Autom':['Battle Autom','Protocol Autom']
+};
+const PROG = {
+  'Void User':[{lv:1,f:'Choose Archetype · Gain 2 Void Power customizations.'},{lv:3,f:'Void Aura: +2 Defense.'},{lv:4,f:'Archetype Feature 1'},{lv:6,f:'Void Aura Mastery: +2 Defense, +2 Will saves.'},{lv:7,f:'Archetype Feature 2'},{lv:9,f:"One With The Void: First Void Power each combat costs 0 VP."},{lv:10,f:'Archetype Capstone'}],
+  'Gunslinger':[{lv:1,f:'Choose Archetype · Gain 2 Equipment choices.'},{lv:3,f:'Fast Hands: Spend 1 GP to reroll any failed skill check.'},{lv:4,f:'Archetype Feature 1'},{lv:6,f:"Ol' Reliable: Once per combat, free EMP Grenade use."},{lv:7,f:'Archetype Feature 2'},{lv:9,f:'Finish the Job: +2d6 damage vs. Bloodied creatures.'},{lv:10,f:'Archetype Capstone'}],
+  'Autom':[{lv:1,f:'Choose Archetype · Gain 2 Modifications · Select Chassis Configuration.'},{lv:3,f:'Subroutine Loop: Gain 1 Passive Modification in addition to standard level-up pick.'},{lv:4,f:'Archetype Feature 1'},{lv:6,f:'Alloy Upgrade: +2 Defense · +1 TP regen per round.'},{lv:7,f:'Archetype Feature 2'},{lv:9,f:'System Surge: Once per long rest, take an extra action immediately after your own.'},{lv:10,f:'Archetype Capstone'}]
+};
+
+// Archetype base abilities (auto-populated in actions table)
+const ARC_BASE = {
+  'Grey Essent':[
+    {n:'Equilibrium',t:'Passive',c:'',d:'Max VP = PRE score. Regain 2 VP at turn start if below half total. Gain an additional Void Power at Level 1. Consecutive powers from same alignment cost +1 VP each time; switching resets the increase.'},
+    {n:'Void-Infused Strike',t:'Action',c:'3 VP',d:'Melee or unarmed strike deals +1d8 Void damage and pushes the target 5 ft.'},
+    {n:'Null Pulse',t:'Reaction',c:'2 VP',d:'When a creature within 30 ft. uses a Void Power, force a reroll — taking either result depending on your intent.'},
+    {n:'Balance Surge',t:'Once/Long Rest',c:'—',d:'Regain VP equal to your max VP. Cannot use Void Powers on your next turn.'}
+  ],
+  'Essent Guardian':[
+    {n:'Defender of the Light',t:'Passive',c:'',d:"While wielding a voidblade, enemies have Disadvantage on attacks against allies within 10 ft. Gain +4 Defense; share half when adjacent to an ally."},
+    {n:'Voidblade Mastery',t:'Action',c:'3 VP',d:'Voidblade strike deals +1d6 damage. On hit: Fort save or target drops a held weapon (Action to recover).'},
+    {n:'Guarded Advance',t:'Reaction',c:'2 VP',d:'When an ally within 30 ft. is attacked, move within 5 ft. of them. They have Resistance to damage until your next turn.'},
+    {n:'Champion of the Void',t:'Once/Long Rest',c:'—',d:'Gain HP equal to one-third your max. Immune to being moved or knocked prone for the rest of this encounter.'}
+  ],
+  'Dark Marauder':[
+    {n:'Unstoppable Fury',t:'Passive',c:'',d:'Gain 10 additional HP at Level 1. While Bloodied, gain Resistance to all damage.'},
+    {n:'Dark Slash',t:'Action',c:'4 VP',d:'Melee hit: +1d8 Void damage. Fort save or target is prone with Speed 0 until end of their next turn. If it kills, extend the save to an adjacent enemy.'},
+    {n:'Void Frenzy',t:'Bonus Action',c:'2 VP',d:'+2d6 damage on next melee attack this turn. Suffer Void damage equal to the lower d6 result at your next turn start.'},
+    {n:'Consume Essence',t:'Once/Long Rest',c:'—',d:'When you reduce a creature to 0 HP, take another full turn. That creature cannot be resurrected.'}
+  ],
+  'Essent Conduit':[
+    {n:'Void Adept',t:'Passive',c:'',d:'Gain an additional Void Power at Level 1 and each level-up. Gain Void Augmentations: 2 at Level 1, +1 at Levels 3/5/7/9.'},
+    {n:'Void Step',t:'Bonus Action',c:'3 VP',d:'Teleport to a location you can see within 30 ft.'},
+    {n:'Master of the Void',t:'Once/Long Rest',c:'—',d:'Use any known Void Power without spending VP, with Advantage on attack rolls or imposing Disadvantage on saves.'}
+  ],
+  'Smuggler':[
+    {n:'Quick Thinking',t:'Passive',c:'',d:'+2 to initiative. Once per round for 2 GP: Dash, Disengage, or Hide as a bonus action.'},
+    {n:'Trick Shot',t:'Action',c:'2 GP',d:'Ranged attack. Normal damage plus target has Disadvantage on their next attack.'},
+    {n:'Bluff & Shoot',t:'Action',c:'5 GP',d:'Opposed Persuasion vs. Awareness. Success: next ranged attack within 1 min is auto-crit. Once per encounter.'},
+    {n:"Lucky Break",t:'Once/Long Rest',c:'—',d:'Reroll any failed check, save, or attack. Any result below 13 counts as 13.'}
+  ],
+  'Bounty Hunter':[
+    {n:"Hunter's Mark",t:'Passive',c:'',d:'Once per turn as a bonus action, mark a target within 60 ft. Deal +1d6 damage to that target.'},
+    {n:'Explosive Shot',t:'Action',c:'4 GP',d:'2d10 Energy to target, 1d10 Energy to creatures within 5 ft. Reflex save for half.'},
+    {n:'Grapple Cord',t:'Action',c:'3 GP',d:'Fire at a creature within 30 ft. Reflex save or Restrained. Retry each turn.'},
+    {n:'Prepared for Anything',t:'Once/Long Rest',c:'—',d:'Choose: (a) Jetpack Boost — fly = movement for the encounter; or (b) Tracking Beacon — track a marked creature for 24 hours.'}
+  ],
+  'Sharpshooter':[
+    {n:'Long Shot Setup',t:'Passive',c:'',d:"If you don't move on your turn: +1d6 damage on next ranged attack. Spend a full round aiming: +2d6 and ignore cover."},
+    {n:'Deadeye Sequence',t:'Action',c:'3 GP',d:'If an ally hits the same target before your next turn, make a reaction attack and grant your ally Advantage.'},
+    {n:'Pinpoint Disarm',t:'Action',c:'4 GP',d:"Ranged attack: half damage and target drops held weapon (Action to recover). Doesn't affect Void weapons."},
+    {n:'One Perfect Shot',t:'Once/Long Rest',c:'—',d:'After Long Shot Setup, attack with Advantage. If total is 12+, auto-crit. Cannot attack next round.'}
+  ],
+  'CQC Operative':[
+    {n:'Brutal Momentum',t:'Passive',c:'',d:'On a melee hit, gain +2 Defense until your next turn. Moving 10+ ft. straight toward a target grants Advantage on the next melee attack.'},
+    {n:'Shock Gauntlet Combo',t:'Action',c:'4 GP',d:'Two melee strikes (2d6+REF each). Fort save or target is Stunned until your next turn.'},
+    {n:'Grappling Latch',t:'Action',c:'2 GP',d:'Magnetic grapple to target within 20 ft. Fort save or pulled to you. Make a melee attack as part of this action.'},
+    {n:'Deadzone Lockdown',t:'Once/Long Rest',c:'—',d:'For 2 rounds: two melee attacks per Action; movement never provokes opportunity attacks; Advantage on melee vs. targets within 5 ft. of cover.'}
+  ],
+  'Battle Autom':[
+    {n:'Tactical Directives',t:'Passive',c:'',d:'Choose one: (a) Heavy Assault: +1 DEF, +2 damage; (b) Precision Killer: +2 Init, +1d8 vs. enemies who have not acted; (c) Automeka Mode: bonus action ball form — +10 ft. move, no opportunity attacks until end of turn.'},
+    {n:'Self-Repair',t:'Action',c:'1–3 TP',d:'Heal 1d4 per TP spent. Use as bonus action if you did not attack this turn.'},
+    {n:'Overdrive',t:'Bonus Action',c:'4 TP',d:'Make an additional Action this turn. Once per encounter.'},
+    {n:'Autom Rampage',t:'Once/Long Rest',c:'—',d:'For the encounter: Advantage on all attacks. Vulnerable to Ion (+1d8 extra). Cannot Stealth or Hide.'}
+  ],
+  'Protocol Autom':[
+    {n:'Skill Database',t:'Passive',c:'',d:'Proficiency in three INT or PRE-based skills. Once per long rest, auto-critically succeed one. +2 TP regen at turn start if you took no damage since your last turn.'},
+    {n:'Behavioral Override',t:'Action',c:'2 TP',d:'Opposed Persuasion (PRE) vs. Awareness (INT) within 30 ft. Success: target Distracted and cannot attack you.'},
+    {n:'Protocol Efficiency',t:'Action',c:'2 TP',d:'Grant an ally Advantage on their next INT or PRE check, Reflex, or Will save. Use as a reaction if they fail a check.'},
+    {n:'Overclocked Directive',t:'Once/Long Rest',c:'—',d:'Choose one ally within 30 ft. For 3 rounds: +2 DEF, +1d6 damage, Advantage on saves. Each round: redirect an attack, let them reroll, or move 10 ft. to block for them.'}
+  ]
+};
+
+// Archetype level features (4, 7, 10)
+const ARC_LVFEATS = {
+  'Grey Essent':{4:{n:'Dual Flow Technique',d:'After a White power, your next Black Hole power costs 1 less VP (min 1), and vice versa. Resets on same-alignment repeat or end of combat.'},7:{n:'Reflexive Surge',d:'When damage would reduce you below half HP, activate any known Void Power as a reaction (VP cost applies). Once per short rest.'},10:{n:'Avatar of Balance',d:'Once per short rest: regain 2 VP per turn start; all powers cost 1 less VP; alternating White/Black Hole powers stack +1d8 per alternation.'}},
+  'Essent Guardian':{4:{n:'Bulwark of the Void',d:'Moving ≤5 ft. on your turn grants +1 Defense until your next turn. Allies within 5 ft. gain +1 to all saves.'},7:{n:"Guardian's Rebuke",d:'When a creature targets an ally, force a Will save: failure = 2d10 damage; success = 2d6 damage. Uses = PRE modifier per long rest (min 1).'},10:{n:'Bastion of Light',d:'Once per long rest, for 1 combat: you and allies within 10 ft. gain Resistance to all damage; intercept ranged attacks; Blade Deflect without Reaction.'}},
+  'Dark Marauder':{4:{n:'Frenzied Momentum',d:'On a melee hit, move 10 ft. without opportunity attacks. First melee Void Power each turn costs 1 less VP if Bloodied.'},7:{n:'Voidblood Assault',d:'On a melee hit, lose 5 HP to deal +2d8 Void damage (3d8 if target is Frightened/Restrained/Stunned). Uses = PRE modifier per long rest (min 1). Max HP +10.'},10:{n:'Void Cataclysm',d:'Once per long rest, for 1 minute: double melee damage; immune to Frightened/Stunned; regain 5 HP and 1 VP per kill. Max HP +10.'}},
+  'Essent Conduit':{4:{n:'Enhanced Focus',d:'Once per long rest, apply two Augmentations to the same Void Power. +1 VP regen if you take no damage on your turn.'},7:{n:'Layered Control',d:'With a single-target Void Power: choose a secondary target for minor effect, or if resisted regain half VP cost. Uses = PRE modifier per long rest (min 1).'},10:{n:'Weaver of the Void',d:'Once per long rest, for 1 combat: cast Void Powers as bonus actions; Augmentations cost 1 less VP; enemies saving against your powers have Disadvantage if already affected; allies within 20 ft. gain +2 to saves.'}},
+  'Smuggler':{4:{n:'Slippery Gambit',d:'On a ranged hit, choose: Dash 10 ft. without opportunity attacks; or force Will save or Distracted. Uses = PRE modifier per long rest (min 1).'},7:{n:'Improvised Mayhem',d:'Once per encounter, improvise an environmental action without using an action (GM approval).'},10:{n:"Scoundrel's Swagger",d:'Once per long rest, for 1 combat: +2 DEF, +10 Initiative, Dash/Hide free once per turn. Reroll any 1 on a d10. Bluff & Shoot and Trick Shot cost no GP.'}},
+  'Bounty Hunter':{4:{n:'Tactical Loadout',d:'After long rest, choose two gadgets at half GP cost. Gadget hits vs. marked targets deal +1d6 extra.'},7:{n:'Neutralize',d:'On a hit, apply one: Suppressing Shot (no reactions next turn); Armor Pierce (−2 DEF until end of their next turn); Wound (no HP recovery for 1 round). Twice per encounter.'},10:{n:'One Step Ahead',d:"Once per short rest: mark two targets; they can't use cover; reroll one attack or save per turn vs. them; any damage forces Fort save or Staggered."}},
+  'Sharpshooter':{4:{n:'Lock & Fire',d:'Bonus action: mark a target. +2 to hit; if next attack vs. them is 12+, auto-crit. Once per long rest.'},7:{n:'Ricochet Calculations',d:'Attacking through cover: ignore cover and roll Advantage. Move 10 ft. after a ranged attack without opportunity attacks (once per round).'},10:{n:'Perfect Shot',d:'Once per long rest: auto-applies Long Shot Setup and Lock & Fire free. Auto-hits in range. Fort save: fail = Blinded/Disarmed/Stunned (choice). Kill = regain 3 GP, Advantage on next attack.'}},
+  'CQC Operative':{4:{n:'Momentum Surge',d:'On a melee hit, make a ranged attack as a bonus action. If both hit, target Fort saves or knocked prone. Uses = FOR modifier per long rest (min 1).'},7:{n:'Flare & Finish',d:'Reduce creature to 0 HP with melee: Dash 20 ft. and ranged attack; or Intimidate within 30 ft. (Will save or Frightened). Switching ranged/melee grants +1 DEF once per round.'},10:{n:'Blade & Blast',d:'Once per long rest, for 1 combat: alternate melee/ranged without bonus actions; melee ignores Resistance; ranged bypasses cover. Both hit same target in one turn: Fort save or Prone, Staggered, −2 DEF for 1 round.'}},
+  'Battle Autom':{4:{n:'Integrated Subsystem',d:'Choose one (change on short rest): Overload Capacitor (+1d6 once/round); Shield Matrix (+1 DEF, ally half area damage); Directive Core (command one allied Autom without an action).'},7:{n:'Kill Protocol: Activate',d:'First attack vs. full-HP creature deals +1d10. Once/encounter, "Target Acquired": Advantage vs. one target for 2 rounds; Reflex save or −2 DEF vs. your attacks.'},10:{n:'Warform Ascendant',d:'Once per long rest, for 1 combat: gain HP = 2× level; two different actions per turn; activate one Modification free; +1d8 Energy on all attacks. After: Staggered for one turn.'}},
+  'Protocol Autom':{4:{n:'Strategic Coordination',d:'When ally within 30 ft. attacks or saves, spend 2 TP as a reaction: +1d6 or reroll one die. Uses = INT modifier per long rest (min 1). TP regen +3 on safe turns.'},7:{n:'Predictive Analysis',d:'At combat start, choose two allies: +2 Initiative; +1 DEF for 2 rounds; or Advantage on first save. Once/combat, 3 TP for System Override: target Autom/device — Fort save or Stunned 1 round.'},10:{n:'Prime Protocol: Uplink',d:'Once per long rest, for 1 combat: allies within 30 ft. gain +2 to all rolls; once/turn one ally takes Help/Dash/Disengage free; support TP costs −1; reset one ally Reaction free.'}}
+};
+
+const VP_DATA = {
+  white:[
+    {n:'Void Heal',vp:3,at:'Bonus Action',d:'Restore 3d4 + PRE modifier HP to yourself or a creature you touch.'},
+    {n:'Mind Trick',vp:2,at:'Bonus Action',d:'Influence a weak-willed target for 1 minute. Will save (Scaling Threat DC) to resist.'},
+    {n:'Void Barrier',vp:3,at:'Bonus Action',d:'Reduce the next instance of incoming damage to yourself by 10. Lasts until triggered or end of your next turn.'},
+    {n:'Void Reflect',vp:4,at:'Reaction',d:'When hit by a Void Power: take half damage and return the other half to the attacker.'},
+    {n:'Void Reflex',vp:4,at:'Bonus Action',d:'+4 Defense for one round.'},
+    {n:'Revitalize',vp:5,at:'Action',d:'Revive a downed ally at 1 HP within 30 ft.'},
+    {n:'Void Mending',vp:2,at:'Free Action',d:'At the start of your turn, restore 1d4 HP to yourself or an adjacent ally.'},
+    {n:'Clarity',vp:3,at:'Reaction',d:'Remove one condition (Frightened/Distracted/Staggered/Stunned) from yourself or ally within 30 ft. at the moment it is applied.'},
+    {n:'Void Siphon',vp:4,at:'Action',d:'Target a Bloodied enemy within 30 ft.: deal 1d6 Void damage and heal an ally within 20 ft. for the same amount.'},
+    {n:'Sanctified Ground',vp:4,at:'Action',d:'10-ft. zone centered on you: allies inside gain +1 to all saves. Lasts until you move 30+ ft. away or the encounter ends. White Void power; suppresses Void Regeneration for 1 round.'},
+    {n:'Void Sight',vp:2,at:'Bonus Action',d:'For 1 minute: see invisible creatures, detect active Void-users within 60 ft., +2 to Awareness checks. Cannot be surprised while active.'}
+  ],
+  black:[
+    {n:'Void Lightning',vp:5,at:'Action',d:'3d6 Energy damage in a 15 ft. cone. Each target saves separately. Hits all in cone — including allies.'},
+    {n:'Void Choke',vp:4,at:'Action',d:'2d6 Void damage to a target within 30 ft. They lose their next Action.'},
+    {n:'Drain Life',vp:4,at:'Action',d:'3d6 Void damage to a target within 30 ft. Heal for half the damage dealt.'},
+    {n:'Fear',vp:4,at:'Action',d:'One target within 30 ft.: Will save or Frightened for 2 rounds.'},
+    {n:'Dark Rage',vp:5,at:'Bonus Action',d:'+2 to attack and damage rolls. Take 1d6 Void self-damage at the start of each of your turns for 3 rounds. Ongoing Dark Rage self-damage ends after 3 rounds.'},
+    {n:'Void Rend',vp:3,at:'Action',d:"Your next attack this turn ignores the target's Defense entirely and deals +1d8 Void damage."},
+    {n:'Entropic Pulse',vp:5,at:'Action',d:'2d6 Void in 15 ft. radius centered on you. Allies with VP regain 1 VP per enemy hit. Hits ALL creatures in radius.'},
+    {n:'Shadow Strike',vp:4,at:'Action',d:'Teleport up to 20 ft. to a space within melee range of a target and immediately attack with Advantage.'},
+    {n:'Void Snare',vp:3,at:'Action',d:'A tendril of Void energy: target Reflex save or Restrained until end of their next turn.'},
+    {n:'Crushing Presence',vp:5,at:'Action',d:'All enemies within 10 ft.: Will save or Disadvantage on attacks until end of your next turn.'}
+  ],
+  universal:[
+    {n:'Void Push / Pull',vp:2,at:'Bonus Action',d:'Knock target prone (Fort save) or pull an object to your hand.'},
+    {n:'Telekinesis',vp:3,at:'Action',d:'Lift and move objects up to 20 lbs per level.'},
+    {n:'Void Jump',vp:2,at:'Movement',d:'Leap up to 30 ft. with no check. Does not provoke opportunity attacks.'},
+    {n:'Precognition',vp:3,at:'Bonus Action',d:'Advantage on your next attack, save, or skill check this turn or next.'},
+    {n:'Blade Throw',vp:2,at:'Action',d:'Hurl your voidblade up to 30 ft. for normal damage + FOR or REF modifier.'},
+    {n:'Resonance',vp:1,at:'Bonus Action',d:'Charge your next Void Power this turn: +1d6 Void damage if it deals damage, or +2 to save DC if it applies a condition.'},
+    {n:'Force Wave',vp:3,at:'Action',d:'15 ft. cone: Fort save or pushed 10 ft. and knocked prone. Hits all in cone.'},
+    {n:'Void Anchor',vp:3,at:'Action',d:"Lock target's position until end of your next turn. Cannot move voluntarily or be forcibly moved."},
+    {n:'Void Echo',vp:3,at:'Reaction',d:'When you use a Void Power this turn, reactivate any power used this turn at 2 VP for half effect (half damage, half duration, or half targets).'},
+    {n:'Phantom Step',vp:2,at:'Bonus Action',d:'Move up to your full speed: no opportunity attacks, ignore difficult terrain.'}
+  ]
+};
+const TECHNIQUES = [
+  {n:'Kinetic Attunement',d:'Unarmed strikes and voidblade passively deal +1d4 Void damage. The Void moves through every strike.'},
+  {n:'Void Sensitivity',d:'Cannot be surprised. If initiative places you later in round 1, act first in round 1 then return to your rolled slot in round 2.'},
+  {n:'Force Resilience',d:'Passive damage reduction of 2 against all non-Void damage.'},
+  {n:'Battle Meditation',d:'At the start of each combat, choose one ally within 30 ft: they gain +1 to all attack rolls for the encounter. Change target on short or long rest.'},
+  {n:'Void Recuperation',d:'Regain 1 VP whenever a creature within 10 ft. is reduced to 0 HP — ally or enemy. The Void reclaims what the living release.'},
+  {n:'Psychic Armor',d:'When a Void Power or mental effect would impose a condition on you, spend 2 VP as a free action to negate it entirely.'},
+  {n:'Aligned Focus',d:'Choose one alignment: powers from that alignment cost 1 less VP (min 1). Powers from the opposing alignment cost 1 more.'},
+  {n:'Echoing Step',d:'After any teleport, leave a Void echo at origin. First enemy entering that space this round makes Will save or Distracted.'},
+  {n:'Residual Power',d:'Excess VP above a power\'s cost (up to 3) stored as residual energy to reduce your next power\'s cost, then resets.'},
+  {n:'Voidborn Instinct',d:'Advantage on all Initiative rolls. First Void Power each combat costs 1 less VP.'}
+];
+const AFFIXES = [
+  {n:'Aetherite (Standard)',r:'Common',d:'No special effect. Default for all voidblades at character creation.'},
+  {n:'Solan Affix (White)',r:'Uncommon',d:'+1d4 Void damage on all voidblade attacks. +1d4 to all Void Healing powers.'},
+  {n:'Nexan Affix (Black)',r:'Uncommon',d:'+1d4 Void damage on attacks. All Void Power costs reduced by 1 VP (min 1).'},
+  {n:'Karnyx Affix',r:'Uncommon',d:'Regain 4 VP on a Critical Hit (natural 18-20 on 2d10 before modifiers).'},
+  {n:'Brontide Affix',r:'Uncommon',d:'Advantage on all initiative rolls.'},
+  {n:'Azrik Affix',r:'Rare',d:'Voidblade attacks ignore 2 Defense.'},
+  {n:'Fractospine Affix',r:'Rare',d:'Grants Reach (10 ft.) to the voidblade. Includes opportunity attacks.'},
+  {n:'Infernys Ingot',r:'Rare',d:'+1d8 Void damage on all voidblade attacks.'},
+  {n:'Cryolux Affix',r:'Rare',d:'On hit: Fort save or target is Deafened and Blinded until end of their next turn.'},
+  {n:'Umbral Affix',r:'Rare',d:'On hit: Will save or target is Stunned until end of their next turn.'}
+];
+const AUGMENTS = [
+  {n:'Echo Pulse',vp:'+2',d:'Power echoes to a second target within 10 ft. at half effect.'},
+  {n:'Flicker Warp',vp:'+1',d:'After casting, teleport up to 10 ft. to any visible unoccupied space.'},
+  {n:'Overload Focus',vp:'+2',d:"This power ignores the target's Defense entirely."},
+  {n:'Temporal Hitch',vp:'+3',d:'If the power is resisted, delay until end of your next turn and reapply it with +2 to the save DC.'},
+  {n:'Lingering Harmonics',vp:'+1',d:'If the power deals damage, the target takes +1d6 Void damage at the start of their next turn.'},
+  {n:'Astral Chain',vp:'+3',d:'On hit: link for 1 minute. Know their exact position, HP, and alignment. Redirect one power to them at any range (ends the link).'},
+  {n:'Mental Shatter',vp:'+2',d:'If the target fails a save, they are Staggered and lose their next Reaction.'},
+  {n:'Warding Echo',vp:'+1',d:'One ally within 10 ft. of the target gains +2 Defense until your next turn.'},
+  {n:'Phantom Pull',vp:'+2',d:'Pull a creature within 15 ft. of the target 10 ft. closer to the target.'},
+  {n:'Void Disjunction',vp:'+3',d:'Electronics scramble. Affected Automs lose 1 TP and are Stunned. (Once per encounter maximum.)'},
+  {n:'Mindtrap Surge',vp:'+4',d:"Target can't distinguish allies: roll d6 — 1–3 they target an ally, 4–6 they act normally."},
+  {n:'Balance Breach',vp:'+2',d:'If target is opposite Void alignment to yours: +1d8 Void damage and Will save or lose 1 VP.'}
+];
+const GS_EQ = {
+  blast:[
+    {n:'HX-65 Heavy Blaster',gp:2,at:'Action',d:'2d6 Energy damage. Ignores up to 4 Defense. Uncommon.'},
+    {n:'Cycler Rifle',gp:3,at:'Action',d:'3d6 Kinetic damage. Fort save or knocked back 10 ft. Common.'},
+    {n:'Ion Disruptor',gp:2,at:'Action',d:'Converts held weapon damage to Ion. Double damage vs. Automs and shields. Augments held weapon. Uncommon.'},
+    {n:'Needlegun',gp:2,at:'Action',d:'No immediate damage. Fort save or Bleeding: 1d8 Kinetic at turn start until healed (any healing clears it; or DC 11 Treat Injury Action). Augments held weapon. Uncommon.'},
+    {n:'Flamethrower',gp:4,at:'Action',d:'15 ft. cone: 2d8 Energy. Reflex save or Burning: +1d8 Energy/turn until extinguished (Action). Cannot use while Grappled or Prone. Uncommon.'},
+    {n:'Stun Blaster',gp:2,at:'Action',d:'No damage. Fort save or Stunned for 1 round. Augments held weapon. Common.'}
+  ],
+  gadget:[
+    {n:'Holographic Decoy',gp:2,at:'Bonus Action',d:'Create a perfect false image of you for 1 minute or until attacked. Common.'},
+    {n:'Jetpack',gp:3,at:'Bonus Action',d:'Fly 60 ft. in any direction, ignoring terrain. Uncommon.'},
+    {n:'Wrist Grappling Hook',gp:2,at:'Bonus Action',d:'Pull yourself up to 20 ft. or pull a small object to you. Common.'},
+    {n:'Medical Dart',gp:3,at:'Bonus Action',d:'Heals a targeted ally within 30 ft. for 3d4 HP. Common.'},
+    {n:'Cloaking Field',gp:5,at:'Action',d:'Invisibility for 1 minute or until you attack. Rare.'},
+    {n:'Tactical HUD',gp:0,at:'Passive',d:'+2 to initiative rolls. Scan enemy weaknesses on Awareness check (GM discretion). Common.'},
+    {n:'Combat Scanner',gp:3,at:'Bonus Action',d:'Mark a target. Allies gain +1d4 damage against it for 3 rounds. Common.'}
+  ],
+  expl:[
+    {n:'Thermal Detonator',gp:5,at:'Action',d:'10 ft. radius, 3d10 Kinetic. Range: 30 ft. Hits ALL in area including allies. Uncommon.'},
+    {n:'EMP Grenade',gp:3,at:'Action',d:'Disables Automs and shields in 10 ft. radius for 1 round. Range: 30 ft. No save for Automs. Common.'},
+    {n:'Cryo Grenade',gp:3,at:'Action',d:'10 ft. radius: −20 ft. movement, 2d6 Energy. Range: 30 ft. Hits all in area. Common.'},
+    {n:'Proximity Mine',gp:4,at:'1 min setup',d:'Triggers on contact: 3d10 Kinetic to that creature. Common.'},
+    {n:'Smoke Bomb',gp:1,at:'Reaction',d:'3×3 square smoke cloud, Total Concealment until end of your next turn. Range: 30 ft. Common.'},
+    {n:'Neural Disruptor',gp:2,at:'Action',d:'Will save or Stunned for 1 round. Range: 30 ft. Uncommon.'},
+    {n:'Repulsor Mine',gp:2,at:'1 min setup',d:'Knocks enemies 10 ft. in a designated direction on trigger. Common.'}
+  ]
+};
+const AT_MODS = {
+  cm:[
+    {n:'Integrated Blaster',tp:'Passive',d:'Built-in blaster pistol: 2d6 Energy damage. Always equipped, cannot be disarmed.'},
+    {n:'Self-Repair Protocol',tp:'Bonus Action (3 TP)',d:'Restore 3d4 + level HP. May use as bonus action if you did not attack this turn. Once per encounter.'},
+    {n:'Targeting Matrix',tp:'Passive',d:'+1 to all ranged attack rolls.'},
+    {n:'Auxiliary Power Core',tp:'Reaction (2 TP, 1/Long Rest)',d:'When subjected to Power Down (EMP, shock): gain immunity for 1d4 rounds.'},
+    {n:'Overclocked Systems',tp:'Action (3 TP)',d:'Take an extra action this turn. Become Stunned on your following turn.'}
+  ],
+  um:[
+    {n:'Advanced Sensors',tp:'Passive',d:'Infrared vision and +3 to Awareness checks.'},
+    {n:'Medical Drone',tp:'Bonus Action (3 TP)',d:'Deploy drone: heals an ally within 60 ft. for 3d4 HP.'},
+    {n:'Holographic Projector',tp:'Action (1 TP)',d:'Create an illusion up to 10 ft. in size for 1 minute.'},
+    {n:'Slicing Suite',tp:'Action (2 TP)',d:'Hack electronics, doors, or security systems with Advantage.'},
+    {n:'Voice Modulator',tp:'Passive',d:'Mimic any voice or sound with perfect accuracy.'},
+    {n:'Tactical Uplink',tp:'Bonus Action (2 TP)',d:'Grant an ally +1d4 to their next attack or skill check.'},
+    {n:'Cloaking Field',tp:'Action (5 TP)',d:'Invisibility for 1 minute or until you attack.'}
+  ],
+  av:[
+    {n:'Magnetized Core',tp:'Passive',d:'Immune to Void Push/Pull and Telekinesis.'},
+    {n:'Ion Resistance',tp:'Passive',d:'Halve all incoming Ion and EMP damage (negates Synthetic Frame Vulnerability).'},
+    {n:'Jammer Pulse',tp:'Bonus Action (2 TP)',d:'Void users in a 10 ft. radius lose 1d4 VP.'}
+  ]
+};
+const SKILLS = [
+  {n:'Athletics',a:'for'},{n:'Endurance',a:'for'},
+  {n:'Piloting',a:'ref'},{n:'Stealth',a:'ref'},
+  {n:'Computer Use',a:'int'},{n:'Demolitions',a:'int'},{n:'Mechanics',a:'int'},
+  {n:'Security',a:'int'},{n:'Investigation',a:'int'},{n:'Awareness',a:'int'},
+  {n:'Treat Injury',a:'int',note:'Automs use Mechanics'},
+  {n:'Persuasion',a:'pre'},{n:'Intimidation',a:'pre'}
+];
+const FAC_LABELS = {'-3':'Hated','-2':'Hostile','-1':'Unfriendly','0':'Neutral','1':'Friendly','2':'Respected','3':'Ally'};
+const FAC_COLS = {'-3':'#e05050','-2':'#d07050','-1':'#c09060','0':'var(--text-l)','1':'var(--accent-l)','2':'#60b880','3':'#40d890'};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  APP STATE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let amCustomRows = [];
+let consState = {stims:2, kits:2, other:0};
+let fundState = 'solvent';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  HELPERS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const g = id => document.getElementById(id);
+const modOf = score => Math.floor((Math.max(1, Math.min(20, parseInt(score) || 10)) - 10) / 2);
+const mStr = m => (m >= 0 ? '+' : '') + m;
+const getScores = () => ({for: parseInt(g('sc-for').value)||10, ref: parseInt(g('sc-ref').value)||10, int: parseInt(g('sc-int').value)||10, pre: parseInt(g('sc-pre').value)||10});
+const getMods = () => { const s = getScores(); return {for:modOf(s.for), ref:modOf(s.ref), int:modOf(s.int), pre:modOf(s.pre)}; };
+const getLv = () => Math.max(1, Math.min(10, parseInt(g('char-level').value) || 1));
+const getCls = () => g('char-cls').value || '';
+const getArc = () => g('char-archetype').value || '';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CORE UPDATE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updateAll() {
+  const m = getMods(), s = getScores(), lv = getLv(), cls = getCls();
+  ['for','ref','int','pre'].forEach(k => { const e = g('md-'+k); if(e) e.textContent = mStr(m[k]); });
+  g('sv-for').textContent = 'Fort: 2d10' + mStr(m.for);
+  g('sv-ref').textContent = 'Reflex: 2d10' + mStr(m.ref);
+  g('sv-pre').textContent = 'Will: 2d10' + mStr(m.pre);
+  g('fort-sv').textContent = '2d10' + mStr(m.for);
+  g('ref-sv').textContent = '2d10' + mStr(m.ref);
+  g('will-sv').textContent = '2d10' + mStr(m.pre);
+  g('melee-atk').textContent = '2d10' + mStr(m.for);
+  g('ranged-atk').textContent = '2d10' + mStr(m.ref);
+  g('init-val').textContent = '1d10' + mStr(m.ref);
+  const bestMod = Math.max(m.for, m.ref, m.int, m.pre);
+  g('threat-dc').textContent = 10 + Math.ceil(lv/2) + bestMod;
+  const die = cls && CLS[cls] ? CLS[cls].die : '?';
+  g('hp-ref').textContent = s.for + ' + d' + die + (die !== '?' ? ' = ' + (s.for + die) : '');
+
+  // Defense
+  let defBonus = 0, defNote = '';
+  const isVoid = cls === 'Void User';
+  const arRow = g('armor-row');
+  if (isVoid) {
+    defNote = 'REF only — no armor allowed';
+    if (arRow) arRow.style.display = 'none';
+  } else if (cls === 'Gunslinger') {
+    if (arRow) arRow.style.display = 'flex';
+    const dlv = document.querySelector('input[name="def-load"]:checked');
+    const dv = dlv ? dlv.value : '0';
+    defBonus = dv === '0' ? 0 : (dv === '2d' ? 2 : parseInt(dv)||0);
+    const extra = parseInt(g('armor-bonus').value)||0;
+    defBonus += extra;
+    defNote = dv === '0' ? 'REF mod, no loadout' : '+' + (dv === '2d' ? 2 : parseInt(dv)||0) + ' Loadout' + (extra ? ' +' + extra : '');
+  } else if (cls === 'Autom') {
+    if (arRow) arRow.style.display = 'none';
+    const chv = document.querySelector('input[name="chassis"]:checked');
+    const cv = chv ? chv.value : '0';
+    defBonus = (cv === '0' || cv === '0s') ? 0 : (cv === '2v' ? 2 : parseInt(cv)||0);
+    if (g('char-species').value === 'Aegis Autom') defBonus += 1;
+    defNote = cv === '0' ? 'REF mod, no chassis' : '+' + defBonus + ' Chassis' + (g('char-species').value === 'Aegis Autom' ? ' +1 Aegis' : '');
+  } else {
+    if (arRow) arRow.style.display = 'none';
+    defNote = 'Select a class';
+  }
+  g('def-val').textContent = m.ref + defBonus;
+  g('def-note').textContent = defNote;
+
+  // Resource pool
+  if (cls && CLS[cls]) {
+    const ci = CLS[cls], govScore = ci.gov === 'int' ? s.int : s.pre;
+    g('res-max').value = govScore;
+    g('res-label').textContent = ci.lbl;
+    g('res-gov').textContent = ci.govLbl;
+    const dispId = ci.res === 'TP' ? 'tp-disp' : ci.res === 'GP' ? 'gp-disp' : 'vp-disp';
+    const de = g(dispId); if (de) de.textContent = ci.res + ': ' + (g('res-cur').value||0) + ' / ' + govScore;
+  }
+  updSkills();
+  updSlots();
+  updSkBudget();
+}
+
+function updBlooded() {
+  const max = parseInt(g('hp-max').value)||0;
+  g('bloodied-lbl').textContent = 'Bloodied at ' + (max > 0 ? Math.ceil(max/2) : 0);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CLASS / ARCHETYPE / SPECIES / BG CHANGES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function onClassChange() {
+  const cls = getCls();
+  ['void','gun','autom'].forEach(k => g('sec-'+k).classList.remove('show'));
+  if (cls === 'Void User') g('sec-void').classList.add('show');
+  else if (cls === 'Gunslinger') g('sec-gun').classList.add('show');
+  else if (cls === 'Autom') g('sec-autom').classList.add('show');
+  const arc = g('char-archetype');
+  arc.innerHTML = '<option value="">— Archetype —</option>';
+  (ARCS[cls]||[]).forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; arc.appendChild(o); });
+  const sgb = g('start-gear-box');
+  if (cls && START_GEAR[cls]) { sgb.style.display='block'; g('start-gear-text').textContent=START_GEAR[cls]; }
+  else sgb.style.display='none';
+  updProgression();
+  updAmAuto();
+  updateAll();
+}
+function onArchetypeChange() {
+  updProgression();
+  updAmAuto();
+  const augAcc = g('acc-aug');
+  if (augAcc) augAcc.style.display = getArc()==='Essent Conduit' ? 'block' : 'none';
+  updSlots();
+}
+function onSpeciesChange() {
+  const sp = g('char-species').value;
+  const sb = g('species-box');
+  sb.innerHTML = sp && SPECIES[sp] ? '<strong>Trait — </strong>' + SPECIES[sp] : 'Select a species to see your trait.';
+  const isA = sp==='Lexicon Autom'||sp==='Aegis Autom';
+  g('autom-note').style.display = isA ? 'block' : 'none';
+  updateAll();
+}
+function onBgChange() {
+  const bg = g('char-bg').value, bb = g('bg-box');
+  if (bg && BG[bg]) bb.innerHTML = '<strong>Skills:</strong> ' + BG[bg].sk + '<br><strong>Feature — </strong>' + BG[bg].feat;
+  else bb.innerHTML = 'Select a background to see your feature.';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  PROGRESSION TABLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updProgression() {
+  const cls = getCls(), arc = getArc(), lv = getLv();
+  const ids = {'Void User':'void-prog','Gunslinger':'gun-prog','Autom':'autom-prog'};
+  const pId = ids[cls]; if (!pId) return;
+  const el = g(pId); if (!el) return;
+  const rows = PROG[cls]||[];
+  if (!rows.length) { el.innerHTML=''; return; }
+  const af = arc ? ARC_LVFEATS[arc] : null;
+  let html = `<div class="fl" style="margin-bottom:.3rem;margin-top:.58rem;">Class &amp; Archetype Progression</div>`;
+  html += `<table class="prog-table"><thead><tr><th>Lv</th><th>Class Feature</th><th>Archetype Feature</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    const past = r.lv <= lv;
+    let afText = '';
+    if (af && [4,7,10].includes(r.lv) && af[r.lv]) afText = `<strong>${af[r.lv].n}</strong> — <span style="font-size:.7rem;color:var(--text-l)">${af[r.lv].d.substring(0,75)}${af[r.lv].d.length>75?'…':''}</span>`;
+    else if ([4,7,10].includes(r.lv)) afText = arc ? 'See archetype features below' : '<em>Choose archetype first</em>';
+    html += `<tr style="opacity:${past?1:.4}"><td class="prog-lv">${r.lv}</td><td style="color:${past?'var(--lbl)':'var(--text-l)'}">${r.f}</td><td style="font-size:.74rem;color:var(--text-s)">${afText}</td></tr>`;
+  });
+  html += '</tbody></table>';
+
+  // Base ability cards
+  if (arc && ARC_BASE[arc]) {
+    html += `<div class="fl" style="margin:.62rem 0 .3rem;">Base Archetype Abilities — ${arc}</div>`;
+    ARC_BASE[arc].forEach(f => {
+      html += `<div class="arc-card"><div class="arc-lv">${f.t}${f.c ? ' · ' + f.c : ''}</div><div class="arc-name">${f.n}</div><div class="arc-desc">${f.d}</div></div>`;
+    });
+  }
+  // Level feature cards
+  if (af && arc) {
+    html += `<div class="fl" style="margin:.62rem 0 .3rem;">Level Features — ${arc}</div>`;
+    [4,7,10].forEach(lvl => {
+      if (!af[lvl]) return;
+      const future = lvl > lv;
+      html += `<div class="arc-card" style="${future?'opacity:.45;':''}" ><div class="arc-lv">Level ${lvl}${future?' (upcoming)':''}</div><div class="arc-name">${af[lvl].n}</div><div class="arc-desc">${af[lvl].d}</div></div>`;
+    });
+  }
+  el.innerHTML = html;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  ACTIONS TABLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updAmAuto() {
+  const arc = getArc(), tbody = g('am-auto'); if (!tbody) return;
+  tbody.innerHTML = '';
+  if (!arc || !ARC_BASE[arc]) return;
+  const seen = new Set();
+  ARC_BASE[arc].forEach(f => {
+    if (seen.has(f.n)) return; seen.add(f.n);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="am-name">${f.n}</td><td class="am-type">${f.t}</td><td class="am-cost">${f.c||'—'}</td><td class="am-desc">${f.d}</td><td><span class="am-src">Auto</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function showAmForm() { g('am-form').style.display='grid'; }
+function hideAmForm() { g('am-form').style.display='none'; }
+function addAmRow() {
+  const n=g('am-n').value.trim()||'—', t=g('am-t').value, c=g('am-c').value||'—', d=g('am-d').value||'';
+  amCustomRows.push({n,t,c,d}); renderAmCustom(); hideAmForm();
+  ['am-n','am-c','am-d'].forEach(id => g(id).value=''); save();
+}
+function delAmRow(i) { amCustomRows.splice(i,1); renderAmCustom(); save(); }
+function renderAmCustom() {
+  const tbody = g('am-custom'); if (!tbody) return;
+  tbody.innerHTML = '';
+  amCustomRows.forEach((r,i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="am-name">${r.n}</td><td class="am-type">${r.t}</td><td class="am-cost">${r.c}</td><td class="am-desc">${r.d}</td><td><button class="am-del-btn" onclick="delAmRow(${i})">×</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SKILLS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function buildSkills() {
+  const grid = g('skill-grid'); grid.innerHTML = '';
+  SKILLS.forEach((sk, i) => {
+    const row = document.createElement('div'); row.className = 'sk-row';
+    row.innerHTML = `<span class="sk-name">${sk.n}${sk.note?'<br><span style="font-size:.58rem;color:var(--text-l)">'+sk.note+'</span>':''}</span><span class="sk-stat">${sk.a.toUpperCase()}</span><input class="sk-pts" type="number" min="0" value="0" data-sk="${i}" data-save="sk-${sk.n.replace(/ /g,'_')}" oninput="updSkills()"><span class="sk-tot" id="skt-${i}">+0</span>`;
+    grid.appendChild(row);
+  });
+}
+function updSkills() {
+  const m = getMods(), lv = getLv(), maxR = lv + 1;
+  let spent = 0;
+  SKILLS.forEach((sk, i) => {
+    const inp = document.querySelector(`[data-sk="${i}"]`); if (!inp) return;
+    let rank = Math.min(maxR, parseInt(inp.value)||0);
+    if (inp.value > maxR) inp.value = maxR;
+    const e = g('skt-'+i); if (e) e.textContent = mStr(rank + m[sk.a]);
+    spent += rank;
+  });
+  g('sk-max-rank').textContent = maxR;
+  updSkBudget(spent);
+}
+function updSkBudget(spent) {
+  const m = getMods(), lv = getLv(), cls = getCls();
+  const perLv = Math.max(1, m.int) + (cls==='Autom'?1:0);
+  const total = 4 + Math.max(1, m.int) + (lv-1)*perLv;
+  if (spent === undefined) {
+    spent = 0;
+    SKILLS.forEach((_,i) => { const inp = document.querySelector(`[data-sk="${i}"]`); if(inp) spent += parseInt(inp.value)||0; });
+  }
+  const remain = total - spent;
+  g('sk-per-lv').textContent = perLv;
+  g('sk-total').textContent = total;
+  g('sk-spent').textContent = spent;
+  g('sk-spent').className = 'sk-bn';
+  g('sk-remain').textContent = remain;
+  g('sk-remain').className = 'sk-bn ' + (remain<0?'warn':'ok');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  POWER LISTS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function buildPwrList(bodyId, items, costKey, costClass, countId, pfx) {
+  const body = g(bodyId); if (!body) return;
+  body.innerHTML = '';
+  items.forEach((item, idx) => {
+    const div = document.createElement('div'); div.className = 'pwr-item';
+    const cv = costKey==='none' ? '—' : (item[costKey]===0 ? 'Pass' : (item[costKey]||item.r||'?'));
+    div.innerHTML = `<input type="checkbox" class="pwr-chk" data-save="${pfx}${idx}" onchange="updCount('${bodyId}','${countId}');updSlots()"><span class="pwr-cost ${costClass}">${cv}</span><div class="pwr-info"><div class="pwr-name">${item.n}${item.r?'<span style="font-size:.58rem;color:var(--mgr);margin-left:.3rem;">'+item.r+'</span>':''}</div><div class="pwr-at">${item.at||item.tp||''}</div><div class="pwr-desc">${item.d}</div></div>`;
+    body.appendChild(div);
+  });
+}
+function buildAllPowers() {
+  buildPwrList('body-white', VP_DATA.white,'vp','vp','cnt-white','vw');
+  buildPwrList('body-black', VP_DATA.black,'vp','vp','cnt-black','vb');
+  buildPwrList('body-univ', VP_DATA.universal,'vp','vp','cnt-univ','vu');
+  buildPwrList('body-tech', TECHNIQUES,'none','no','cnt-tech','vt');
+  buildPwrList('body-aff', AFFIXES,'none','no','cnt-aff','va');
+  buildPwrList('body-aug', AUGMENTS,'vp','aug','cnt-aug','vg');
+  buildPwrList('body-blast', GS_EQ.blast,'gp','gp','cnt-blast','gb');
+  buildPwrList('body-gadget', GS_EQ.gadget,'gp','gp','cnt-gadget','gg');
+  buildPwrList('body-expl', GS_EQ.expl,'gp','gp','cnt-expl','ge');
+  buildPwrList('body-cm', AT_MODS.cm,'tp','tp','cnt-cm','acm');
+  buildPwrList('body-um', AT_MODS.um,'tp','tp','cnt-um','aum');
+  buildPwrList('body-av', AT_MODS.av,'tp','tp','cnt-av','aav');
+}
+function updCount(bodyId, countId) {
+  const body = g(bodyId), cnt = g(countId); if (!body||!cnt) return;
+  cnt.textContent = body.querySelectorAll('.pwr-chk:checked').length + ' / ' + body.querySelectorAll('.pwr-chk').length;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SLOT COUNTING  (Loadout/Chassis each = 1 slot)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function updSlots() {
+  const lv = getLv(), cls = getCls();
+  const avail = lv + 1;
+  let used = 0;
+  document.querySelectorAll('#sec-void .pwr-chk:checked, #sec-gun .pwr-chk:checked, #sec-autom .pwr-chk:checked').forEach(() => used++);
+  if (cls === 'Gunslinger') {
+    const dlv = document.querySelector('input[name="def-load"]:checked');
+    if (dlv && dlv.value !== '0') used++;
+  } else if (cls === 'Autom') {
+    const chv = document.querySelector('input[name="chassis"]:checked');
+    if (chv && chv.value !== '0') used++;
+  }
+  const remain = avail - used;
+  g('slots-avail').textContent = avail;
+  g('slots-used').textContent = used;
+  const re = g('slots-remain');
+  re.textContent = remain;
+  re.className = remain < 0 ? 'slot-warn' : remain === 0 ? 'slot-norm' : 'slot-ok';
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  WEAPONS TABLE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function buildWeapons() {
+  const tbody = g('wpn-tbody'); tbody.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="text" data-save="wpn-n${i}" placeholder="Weapon name"></td><td><input type="text" data-save="wpn-d${i}" placeholder="2d6"></td><td><select data-save="wpn-t${i}"><option value="K">⬛ Kinetic</option><option value="E">⬟ Energy</option><option value="I">⬡ Ion</option><option value="V">⬢ Void</option></select></td><td><select data-save="wpn-a${i}"><option>REF</option><option>FOR</option></select></td><td><select data-save="wpn-r${i}"><option>Common</option><option>Uncommon</option><option>Rare</option></select></td><td><input type="text" data-save="wpn-s${i}" placeholder="Concealable, Reach, Shoot Twice, Augments…"></td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CONSUMABLES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function adjC(k, d) {
+  consState[k] = Math.max(0, (consState[k]||0)+d);
+  const e = g('c-'+k); if(e) e.textContent = consState[k];
+  save();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CONDITIONS, DS, REST, HP/RES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('cond-btn')) { e.target.classList.toggle('active'); save(); }
+  const fb = e.target.closest('.fund-btn'); if (fb && fb.dataset.fund) setFunding(fb.dataset.fund);
+});
+function toggleDS(dot) {
+  dot.classList.toggle('filled');
+  const succ = document.querySelectorAll('#ds-s .filled').length;
+  const fail = document.querySelectorAll('#ds-f .filled').length;
+  const st = g('ds-status');
+  if (succ>=3) st.textContent='✓ STABLE'; else if (fail>=3) st.textContent='✗ DEAD'; else if (succ>0||fail>0) st.textContent='— DYING'; else st.textContent='—';
+  save();
+}
+function clearDS() { document.querySelectorAll('.ds-dot').forEach(d=>d.classList.remove('filled')); g('ds-status').textContent='—'; }
+function applyHP(sign) {
+  const amt=parseInt(g('hp-amt').value)||0; if(!amt) return;
+  const max=parseInt(g('hp-max').value)||0;
+  g('hp-cur').value=Math.max(0, Math.min(max, (parseInt(g('hp-cur').value)||0)+sign*amt)); save();
+}
+function applyRes(sign) {
+  const amt=parseInt(g('res-amt').value)||0; if(!amt) return;
+  const max=parseInt(g('res-max').value)||0;
+  g('res-cur').value=Math.max(0, Math.min(max, (parseInt(g('res-cur').value)||0)+sign*amt)); save();
+}
+function shortRest() {
+  const hm=parseInt(g('hp-max').value)||0;
+  g('hp-cur').value=Math.min(hm,(parseInt(g('hp-cur').value)||0)+Math.floor(hm/2));
+  const rm=parseInt(g('res-max').value)||0;
+  g('res-cur').value=Math.min(rm,(parseInt(g('res-cur').value)||0)+Math.floor(rm/2));
+  updBlooded(); updateAll(); save();
+}
+function longRest() {
+  g('hp-cur').value=g('hp-max').value; g('res-cur').value=g('res-max').value;
+  clearDS(); document.querySelectorAll('.cond-btn.active').forEach(b=>b.classList.remove('active'));
+  updBlooded(); updateAll(); save();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  FUNDING
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function setFunding(state) {
+  fundState = state;
+  document.querySelectorAll('.fund-btn').forEach(b=>b.classList.remove('active'));
+  const btn = document.querySelector('.fund-btn.'+state); if(btn) btn.classList.add('active');
+  const labels={funded:'▲ Funded',solvent:'◆ Solvent',strapped:'▼ Strapped'};
+  g('cb-fund').textContent = labels[state]||state;
+  const isS = state==='strapped';
+  const eb=g('edge-box'), cbe=g('cb-edge');
+  if(eb) eb.classList.toggle('show',isS);
+  if(cbe) cbe.style.display=isS?'block':'none';
+  save();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  MISC UI
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function setAlign(btn) {
+  document.querySelectorAll('.align-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); save();
+}
+function updFS(inp) {
+  const v=Math.max(-3,Math.min(3,parseInt(inp.value)||0)); inp.value=v;
+  const st=inp.nextElementSibling; if(!st||!st.classList.contains('fac-st')) return;
+  st.textContent = FAC_LABELS[String(v)]||'Neutral';
+  st.style.color = FAC_COLS[String(v)]||'var(--text-l)';
+}
+function togAcc(hd) { hd.closest('.pwr-acc').classList.toggle('collapsed'); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  TABS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const pg=g('page-'+btn.dataset.tab); if(pg) pg.classList.add('active');
+    btn.classList.add('active');
+  });
+});
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SAVE / LOAD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function save() {
+  const data = {};
+  document.querySelectorAll('[data-save]').forEach(el => {
+    if (el.type==='checkbox') data[el.dataset.save]=el.checked;
+    else if (el.type==='radio') { if(el.checked) data[el.dataset.save]=el.value; }
+    else data[el.dataset.save]=el.value;
+  });
+  document.querySelectorAll('.pwr-chk').forEach(cb=>{ if(cb.dataset.save) data[cb.dataset.save]=cb.checked; });
+  data._funding=fundState;
+  data._amCustom=JSON.stringify(amCustomRows);
+  data._cons=JSON.stringify(consState);
+  const conds=[]; document.querySelectorAll('.cond-btn.active').forEach(b=>conds.push(b.dataset.cond||b.textContent));
+  data._conds=JSON.stringify(conds);
+  const ds={s:[],f:[]};
+  document.querySelectorAll('#ds-s .ds-dot').forEach(d=>ds.s.push(d.classList.contains('filled')));
+  document.querySelectorAll('#ds-f .ds-dot').forEach(d=>ds.f.push(d.classList.contains('filled')));
+  data._ds=JSON.stringify(ds);
+  const al=document.querySelector('.align-btn.active'); if(al) data._align=al.textContent.trim();
+  localStorage.setItem(LS, JSON.stringify(data));
+}
+
+function load() {
+  const raw=localStorage.getItem(LS); if(!raw) return;
+  let data; try{ data=JSON.parse(raw); }catch(e){ return; }
+  document.querySelectorAll('[data-save]').forEach(el=>{
+    const v=data[el.dataset.save]; if(v===undefined||v===null) return;
+    if(el.type==='checkbox') el.checked=(v===true||v==='true');
+    else if(el.type==='radio'){ if(el.value===v) el.checked=true; }
+    else el.value=v;
+  });
+  const cls=g('char-cls').value; if(cls) onClassChange();
+  const arc=g('char-archetype').value; if(arc){ g('char-archetype').value=arc; onArchetypeChange(); }
+  const sp=g('char-species').value; if(sp) onSpeciesChange();
+  const bg=g('char-bg').value; if(bg) onBgChange();
+  if(data._funding) setFunding(data._funding);
+  if(data._amCustom){ try{ amCustomRows=JSON.parse(data._amCustom)||[]; renderAmCustom(); }catch(e){} }
+  if(data._cons){ try{ Object.assign(consState,JSON.parse(data._cons)); ['stims','kits','other'].forEach(k=>{ const e=g('c-'+k); if(e) e.textContent=consState[k]||0; }); }catch(e){} }
+  if(data._conds){ try{ const cs=JSON.parse(data._conds); document.querySelectorAll('.cond-btn').forEach(b=>{ if(cs.includes(b.dataset.cond||b.textContent)) b.classList.add('active'); }); }catch(e){} }
+  if(data._ds){ try{ const ds=JSON.parse(data._ds); document.querySelectorAll('#ds-s .ds-dot').forEach((d,i)=>{ if(ds.s&&ds.s[i]) d.classList.add('filled'); }); document.querySelectorAll('#ds-f .ds-dot').forEach((d,i)=>{ if(ds.f&&ds.f[i]) d.classList.add('filled'); }); }catch(e){} }
+  document.querySelectorAll('.pwr-chk').forEach(cb=>{ if(cb.dataset.save&&data[cb.dataset.save]===true) cb.checked=true; });
+  if(data._align){ document.querySelectorAll('.align-btn').forEach(b=>{ if(b.textContent.trim()===data._align){ document.querySelectorAll('.align-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); } }); }
+  const succ=document.querySelectorAll('#ds-s .filled').length, fail=document.querySelectorAll('#ds-f .filled').length;
+  const st=g('ds-status');
+  if(succ>=3) st.textContent='✓ STABLE'; else if(fail>=3) st.textContent='✗ DEAD'; else if(succ>0||fail>0) st.textContent='— DYING';
+  [['body-white','cnt-white'],['body-black','cnt-black'],['body-univ','cnt-univ'],['body-tech','cnt-tech'],['body-aff','cnt-aff'],['body-aug','cnt-aug'],
+   ['body-blast','cnt-blast'],['body-gadget','cnt-gadget'],['body-expl','cnt-expl'],
+   ['body-cm','cnt-cm'],['body-um','cnt-um'],['body-av','cnt-av']].forEach(([b,c])=>updCount(b,c));
+  document.querySelectorAll('.fac-in[type="number"]').forEach(inp=>updFS(inp));
+  updBlooded(); updateAll();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  INIT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.addEventListener('DOMContentLoaded', () => {
+  buildSkills();
+  buildAllPowers();
+  buildWeapons();
+  load();
+  updateAll();
+  updBlooded();
+  g('save-btn').addEventListener('click', () => {
+    save();
+    const msg=g('save-msg'); msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'),1800);
+  });
+  document.addEventListener('input', e=>{
+    if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) save();
+  });
+  document.addEventListener('change', e=>{
+    if(['INPUT','SELECT'].includes(e.target.tagName)){
+      save();
+      if(e.target.name==='def-load'||e.target.name==='chassis') updateAll();
+    }
+  });
+});
+</script>
+</body>
+</html>
