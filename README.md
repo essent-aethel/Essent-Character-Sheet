@@ -8,7 +8,7 @@
 
 ## ▶ Live Sheet
 
-**[Open the Agent Dossier →](https://essent-aethel.github.io/Essent-Character-Sheet/essent-character-sheet.html)**
+**[Open the Agent Dossier →](https://essent-aethel.github.io/Essent-Character-Sheet/ESSENT-character-sheet.html)**
 
 Works in any modern browser. No account or install required. All data saves locally to your browser.
 
